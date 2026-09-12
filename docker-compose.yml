@@ -1,0 +1,95 @@
+version: "3.9"
+
+services:
+  # ─────────────────── PostgreSQL ───────────────────
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sih
+      POSTGRES_PASSWORD: sih
+      POSTGRES_DB: sih_netflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sih -d sih_netflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────── Redis ────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─────────────────── FastAPI Backend ──────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://sih:sih@db:5432/sih_netflow
+      SYNC_DATABASE_URL: postgresql+psycopg2://sih:sih@db:5432/sih_netflow
+      REDIS_URL: redis://redis:6379/0
+      UPLOAD_DIR: /uploads
+    volumes:
+      - ./backend:/app
+      - upload_data:/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ─────────────────── Celery Worker ────────────────
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://sih:sih@db:5432/sih_netflow
+      SYNC_DATABASE_URL: postgresql+psycopg2://sih:sih@db:5432/sih_netflow
+      REDIS_URL: redis://redis:6379/0
+      UPLOAD_DIR: /uploads
+    volumes:
+      - ./backend:/app
+      - upload_data:/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.celery_app worker --loglevel=info --concurrency=2
+
+  # ─────────────────── React Frontend ───────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  upload_data:
