@@ -27,8 +27,16 @@ class TimeWindowAggregator:
             windows[idx]["packets"].append(p)
             
         for f in flows:
-            # start_time is a datetime object from flow_extractor; convert to unix timestamp
-            flow_ts = f["start_time"].timestamp() if hasattr(f["start_time"], "timestamp") else float(f["start_time"])
+            # Prefer numeric first_packet_ts to avoid timezone/epoch conversion issues on Windows
+            if "first_packet_ts" in f:
+                flow_ts = float(f["first_packet_ts"])
+            elif hasattr(f.get("start_time"), "timestamp"):
+                try:
+                    flow_ts = f["start_time"].timestamp()
+                except (OSError, ValueError):
+                    flow_ts = min_ts
+            else:
+                flow_ts = float(f.get("start_time", min_ts))
             idx = int((flow_ts - min_ts) // self.window_seconds)
             if idx in windows:
                 windows[idx]["flows"].append(f)

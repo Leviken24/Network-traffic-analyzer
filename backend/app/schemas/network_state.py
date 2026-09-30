@@ -1,11 +1,10 @@
 from pydantic import BaseModel, ConfigDict
-from uuid import UUID
 from datetime import datetime
 from typing import Dict, Any
 
 class NetworkStateRead(BaseModel):
-    id: UUID
-    job_id: UUID
+    id: str
+    job_id: str
     window_index: int
     window_start: datetime
     window_end: datetime

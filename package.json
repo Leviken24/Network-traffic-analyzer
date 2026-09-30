@@ -1,7 +1,7 @@
 {
   "name": "sih-hackathon-prototype",
   "version": "1.0.0",
-  "description": "<<<<<<< HEAD\r # Network-traffic-analyzer\r =======\r # SIH NetFlow — Phase 1: Network Traffic Ingestion & Preprocessing",
+  "description": "SIH NetFlow — AI-Based Network Attack Forecasting / Temporal World Model for Predictive Cyber Defence",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { listJobs } from '../api/client';
+import { CloudArrowUpIcon, TableCellsIcon, SparklesIcon, ScaleIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
@@ -26,14 +27,14 @@ export default function Jobs() {
 
   const getStatusBadge = (status) => {
     const styles = {
-      PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      PROCESSING: 'bg-blue-100 text-blue-800 border-blue-200',
-      DONE: 'bg-green-100 text-green-800 border-green-200',
-      FAILED: 'bg-red-100 text-red-800 border-red-200'
+      PENDING: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+      PROCESSING: 'bg-blue-500/20 text-blue-300 border-blue-500/30 animate-pulse',
+      DONE: 'bg-green-500/20 text-green-300 border-green-500/30',
+      FAILED: 'bg-red-500/20 text-red-300 border-red-500/30'
     };
-    const style = styles[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+    const style = styles[status] || 'bg-gray-500/20 text-gray-300 border-gray-500/30';
     return (
-      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${style}`}>
+      <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-medium border ${style}`}>
         {status}
       </span>
     );
@@ -48,66 +49,105 @@ export default function Jobs() {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Processing Jobs</h1>
+    <div className="space-y-6 animate-fadeIn">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 flex items-center gap-2">
+            <TableCellsIcon className="w-8 h-8 text-cyan-400" />
+            Ingested Telemetry Jobs
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">
+            Real-time pipeline monitoring & temporal feature sequence tracking.
+          </p>
+        </div>
         <Link 
-          to="/"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-brand-600 hover:bg-brand-700"
+          to="/upload"
+          className="inline-flex items-center gap-2 px-4 py-2 border border-cyan-500/40 text-sm font-bold rounded-lg text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/25 transition-all shadow-[0_0_15px_rgba(0,245,255,0.2)]"
         >
-          Upload New
+          <CloudArrowUpIcon className="w-4 h-4" />
+          Upload New File
         </Link>
       </div>
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+
+      <div className="card border border-cyan-500/25 overflow-hidden">
         {loading && jobs.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Loading jobs...</div>
+          <div className="p-12 text-center text-gray-400">Loading telemetry jobs...</div>
         ) : jobs.length === 0 ? (
           <div className="p-12 text-center">
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No jobs found</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by uploading a new PCAP or CSV file.</p>
+            <h3 className="text-lg font-bold text-gray-200">No jobs found</h3>
+            <p className="mt-1 text-sm text-gray-400">Get started by uploading a PCAP or CSV telemetry file.</p>
+            <Link
+              to="/upload"
+              className="mt-4 inline-block px-4 py-2 rounded-lg bg-cyan-500 text-black font-bold text-xs"
+            >
+              Go to Upload
+            </Link>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {jobs.map((job) => (
-                <tr 
-                  key={job.id} 
-                  className={job.status === 'DONE' ? 'cursor-pointer hover:bg-gray-50 transition-colors' : ''}
-                  onClick={() => job.status === 'DONE' && navigate(`/jobs/${job.id}/timeline`)}
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{job.filename}</div>
-                    <div className="text-xs text-gray-500">Win: {job.window_seconds}s</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(job.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatSize(job.file_size)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(job.created_at).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    {job.status === 'DONE' ? (
-                      <span className="text-brand-600 hover:text-brand-900">View Timeline →</span>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-800 text-sm">
+              <thead className="bg-black/60">
+                <tr className="text-xs uppercase tracking-wider text-gray-400 text-left">
+                  <th scope="col" className="px-6 py-3.5">File & Resolution</th>
+                  <th scope="col" className="px-6 py-3.5">Status</th>
+                  <th scope="col" className="px-6 py-3.5">File Size</th>
+                  <th scope="col" className="px-6 py-3.5">Ingested At</th>
+                  <th scope="col" className="px-6 py-3.5 text-right">Analysis Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-800/60 bg-transparent">
+                {jobs.map((job) => (
+                  <tr 
+                    key={job.id} 
+                    className="hover:bg-cyan-950/20 transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-semibold font-mono text-cyan-200">{job.filename}</div>
+                      <div className="text-xs text-gray-500">ID: {job.id.substring(0, 8)}... · Window: {job.window_seconds}s</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(job.status)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
+                      {formatSize(job.file_size)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                      {new Date(job.created_at).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right space-x-2 text-xs">
+                      {job.status === 'DONE' ? (
+                        <>
+                          <Link
+                            to={`/jobs/${job.id}/predict`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 font-semibold transition-colors"
+                          >
+                            <SparklesIcon className="w-3.5 h-3.5" />
+                            Forecast
+                          </Link>
+                          <Link
+                            to={`/jobs/${job.id}/timeline`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 font-semibold transition-colors"
+                          >
+                            <ClockIcon className="w-3.5 h-3.5" />
+                            Timeline
+                          </Link>
+                          <Link
+                            to={`/jobs/${job.id}/benchmark`}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-700/40 text-gray-300 border border-gray-600 hover:bg-gray-700/60 font-semibold transition-colors"
+                          >
+                            <ScaleIcon className="w-3.5 h-3.5" />
+                            Benchmark
+                          </Link>
+                        </>
+                      ) : (
+                        <span className="text-gray-500 italic">Processing traffic...</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

@@ -1,12 +1,21 @@
 import csv
 from typing import List, Union
-from scapy.all import rdpcap, IP, TCP, UDP, ICMP
+try:
+    from scapy.all import rdpcap, IP, TCP, UDP, ICMP
+    SCAPY_AVAILABLE = True
+except ImportError:
+    SCAPY_AVAILABLE = False
+    rdpcap = IP = TCP = UDP = ICMP = None
 import pandas as pd
 from datetime import datetime
 
 
 class PcapParser:
     def parse(self, file_path: str) -> List[dict]:
+        if not SCAPY_AVAILABLE:
+            raise ImportError(
+                "scapy is required for PCAP parsing. Please install scapy: pip install scapy"
+            )
         packets = rdpcap(file_path)
         parsed = []
         for p in packets:
@@ -156,9 +165,9 @@ class CsvParser:
             proto = _parse_proto(row.get(col_map.get("protocol", ""), "OTHER"))
 
             # Byte length: fwd+bwd > single length > packet count estimate
-            if col_map.get("fwd_bytes") and col_map.get("bwd_bytes"):
-                fwd = _safe_float(row.get(col_map["fwd_bytes"], 0))
-                bwd = _safe_float(row.get(col_map["bwd_bytes"], 0))
+            if col_map.get("fwd_bytes") or col_map.get("bwd_bytes"):
+                fwd = _safe_float(row.get(col_map["fwd_bytes"], 0)) if col_map.get("fwd_bytes") else 0.0
+                bwd = _safe_float(row.get(col_map["bwd_bytes"], 0)) if col_map.get("bwd_bytes") else 0.0
                 length = max(int(fwd + bwd), 64)
             elif col_map.get("length"):
                 length = max(_safe_int(row.get(col_map["length"], 64)), 64)

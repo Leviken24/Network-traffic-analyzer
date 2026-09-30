@@ -1,1 +1,13 @@
-node_modules
+node_modules/
+**/node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+*.db
+*.sqlite3
+backend/uploads/
+frontend/dist/
+dist/
+.env.local

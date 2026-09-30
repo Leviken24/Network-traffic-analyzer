@@ -1,10 +1,9 @@
 from pydantic import BaseModel, ConfigDict
-from uuid import UUID
 from datetime import datetime
 
 class TimelineRead(BaseModel):
-    id: UUID
-    job_id: UUID
+    id: str
+    job_id: str
     state_count: int
     window_seconds: int
     capture_start: datetime
