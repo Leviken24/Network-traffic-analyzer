@@ -36,13 +36,13 @@ export default function Dashboard() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'DONE':
-        return <span className="inline-flex items-center gap-1.5 text-xs text-[#4CAF7A] font-mono"><span className="w-1.5 h-1.5 rounded-full bg-[#4CAF7A]"></span>Completed</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#22C55E] font-mono"><span className="w-1.5 h-1.5 rounded-full bg-[#22C55E]"></span>Completed</span>;
       case 'PROCESSING':
-        return <span className="inline-flex items-center gap-1.5 text-xs text-[#C9A227] font-mono animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-[#C9A227]"></span>Processing</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#F59E0B] font-mono animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]"></span>Processing</span>;
       case 'FAILED':
-        return <span className="inline-flex items-center gap-1.5 text-xs text-[#D64545] font-mono"><span className="w-1.5 h-1.5 rounded-full bg-[#D64545]"></span>Failed</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#EF4444] font-mono"><span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></span>Failed</span>;
       default:
-        return <span className="inline-flex items-center gap-1.5 text-xs text-[#666666] font-mono">Pending</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#71717A] font-mono">Pending</span>;
     }
   };
 
@@ -68,15 +68,15 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Top Header & Actions */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-5">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#242943] pb-5">
         <div>
-          <div className="text-[11px] font-mono tracking-widest text-[#C9A227] uppercase mb-1">
+          <div className="text-[11px] font-mono tracking-widest text-[#6366F1] uppercase mb-1">
             System Threat Posture
           </div>
-          <h1 className="text-2xl font-light text-[#F5F5F5] tracking-tight">
+          <h1 className="text-2xl font-light text-[#F8FAFC] tracking-tight">
             Network Operations & Predictive Intelligence
           </h1>
-          <p className="text-xs text-[#A1A1A1] mt-1">
+          <p className="text-xs text-[#A1A1AA] mt-1">
             Autonomous multi-step attack trajectory forecasting through continuous temporal traffic analysis.
           </p>
         </div>
@@ -84,26 +84,26 @@ export default function Dashboard() {
         <div className="flex flex-wrap items-center gap-2.5">
           <Link
             to="/upload"
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#121212] border border-[#C9A227]/50 text-[#F5F5F5] text-xs font-medium hover:border-[#C9A227] hover:bg-[#181818] transition-all"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#0F1220] border border-[#6366F1]/50 text-[#F8FAFC] text-xs font-medium hover:border-[#818CF8] hover:bg-[#14182A] transition-all"
           >
-            <ArrowUpTrayIcon className="w-3.5 h-3.5 text-[#C9A227]" />
+            <ArrowUpTrayIcon className="w-3.5 h-3.5 text-[#818CF8]" />
             Import Telemetry
           </Link>
           {latestJob && (
             <Link
               to={`/jobs/${latestJob.id}/predict`}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[#F5F5F5] text-xs font-medium hover:bg-[rgba(255,255,255,0.08)] transition-all"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#14182A] border border-[#242943] text-[#F8FAFC] text-xs font-medium hover:border-[#818CF8]/50 hover:text-[#818CF8] transition-all"
             >
-              <ArrowTrendingUpIcon className="w-3.5 h-3.5 text-[#A1A1A1]" />
+              <ArrowTrendingUpIcon className="w-3.5 h-3.5 text-[#A1A1AA]" />
               View Forecast
             </Link>
           )}
           {latestJob && (
             <Link
               to={`/jobs/${latestJob.id}/benchmark`}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-[#A1A1A1] text-xs font-medium hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.08)] transition-all"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-sm bg-[#14182A] border border-[#242943] text-[#A1A1AA] text-xs font-medium hover:text-[#F8FAFC] hover:border-[#818CF8]/50 transition-all"
             >
-              <ScaleIcon className="w-3.5 h-3.5 text-[#666666]" />
+              <ScaleIcon className="w-3.5 h-3.5 text-[#71717A]" />
               Benchmark
             </Link>
           )}
@@ -111,52 +111,52 @@ export default function Dashboard() {
       </div>
 
       {/* Core Metrics Strip: Integrated into page with thin dividers instead of repetitive boxed cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-2 border-b border-[rgba(255,255,255,0.06)]">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-2 border-b border-[#242943]">
         <div>
-          <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+          <div className="text-[10px] font-mono tracking-wider text-[#71717A] uppercase">
             Predictive Model Engine
           </div>
-          <div className="text-lg font-normal text-[#F5F5F5] mt-1 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#4CAF7A]"></span>
+          <div className="text-lg font-normal text-[#F8FAFC] mt-1 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#22C55E]"></span>
             Operational
           </div>
-          <div className="text-[11px] text-[#A1A1A1] mt-0.5 font-mono">
+          <div className="text-[11px] text-[#A1A1AA] mt-0.5 font-mono">
             Sequential GRU &bull; Local Latent Space
           </div>
         </div>
 
-        <div className="border-l border-[rgba(255,255,255,0.06)] pl-6">
-          <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+        <div className="border-l border-[#242943] pl-6">
+          <div className="text-[10px] font-mono tracking-wider text-[#71717A] uppercase">
             Ingested Datasets
           </div>
-          <div className="text-lg font-normal text-[#F5F5F5] mt-1">
-            {jobs.length} <span className="text-xs text-[#666666] font-normal">Captures</span>
+          <div className="text-lg font-normal text-[#F8FAFC] mt-1">
+            {jobs.length} <span className="text-xs text-[#71717A] font-normal">Captures</span>
           </div>
-          <div className="text-[11px] text-[#A1A1A1] mt-0.5">
+          <div className="text-[11px] text-[#A1A1AA] mt-0.5">
             {doneJobs.length} processed sessions
           </div>
         </div>
 
-        <div className="border-l border-[rgba(255,255,255,0.06)] pl-6">
-          <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+        <div className="border-l border-[#242943] pl-6">
+          <div className="text-[10px] font-mono tracking-wider text-[#71717A] uppercase">
             Analyzed Packets
           </div>
-          <div className="text-lg font-normal text-[#F5F5F5] mt-1 font-mono">
+          <div className="text-lg font-normal text-[#F8FAFC] mt-1 font-mono">
             {totalPackets > 0 ? totalPackets.toLocaleString() : '0'}
           </div>
-          <div className="text-[11px] text-[#A1A1A1] mt-0.5">
+          <div className="text-[11px] text-[#A1A1AA] mt-0.5">
             Normalized temporal windows
           </div>
         </div>
 
-        <div className="border-l border-[rgba(255,255,255,0.06)] pl-6">
-          <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+        <div className="border-l border-[#242943] pl-6">
+          <div className="text-[10px] font-mono tracking-wider text-[#71717A] uppercase">
             Active Flow Sessions
           </div>
-          <div className="text-lg font-normal text-[#F5F5F5] mt-1 font-mono">
+          <div className="text-lg font-normal text-[#F8FAFC] mt-1 font-mono">
             {totalFlows > 0 ? totalFlows.toLocaleString() : '0'}
           </div>
-          <div className="text-[11px] text-[#A1A1A1] mt-0.5">
+          <div className="text-[11px] text-[#A1A1AA] mt-0.5">
             Bidirectional state matrices
           </div>
         </div>
@@ -165,10 +165,10 @@ export default function Dashboard() {
       {/* Main Analysis Architecture: Pipeline + Threat Summary */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
+          <h2 className="text-xs font-mono tracking-wider text-[#A1A1AA] uppercase">
             Continuous Defence Pipeline
           </h2>
-          <span className="text-[11px] text-[#666666]">
+          <span className="text-[11px] text-[#71717A]">
             Real-time state trajectory mapping
           </span>
         </div>
@@ -179,12 +179,12 @@ export default function Dashboard() {
             {pipelineStages.map((stage, idx) => (
               <React.Fragment key={stage.num}>
                 <div className="flex-1">
-                  <div className="text-[10px] font-mono text-[#C9A227]">{stage.num}</div>
-                  <div className="text-xs font-medium text-[#F5F5F5] mt-0.5">{stage.name}</div>
-                  <div className="text-[10px] text-[#666666] mt-0.5">{stage.desc}</div>
+                  <div className="text-[10px] font-mono text-[#6366F1]">{stage.num}</div>
+                  <div className="text-xs font-medium text-[#F8FAFC] mt-0.5">{stage.name}</div>
+                  <div className="text-[10px] text-[#71717A] mt-0.5">{stage.desc}</div>
                 </div>
                 {idx < pipelineStages.length - 1 && (
-                  <div className="text-[#666666] text-xs px-1 select-none font-mono">&rarr;</div>
+                  <div className="text-[#71717A] text-xs px-1 select-none font-mono">&rarr;</div>
                 )}
               </React.Fragment>
             ))}
@@ -196,39 +196,39 @@ export default function Dashboard() {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
+            <h2 className="text-xs font-mono tracking-wider text-[#A1A1AA] uppercase">
               Telemetry Ingestion Ledger
             </h2>
-            <p className="text-[11px] text-[#666666] mt-0.5">
+            <p className="text-[11px] text-[#71717A] mt-0.5">
               Processed network traffic sessions and discrete time window series
             </p>
           </div>
           <Link
             to="/jobs"
-            className="text-xs text-[#C9A227] hover:text-[#E0B83F] flex items-center gap-1 font-medium transition-colors"
+            className="text-xs text-[#818CF8] hover:text-[#6366F1] flex items-center gap-1 font-medium transition-colors"
           >
             All Sessions <ArrowRightIcon className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         {loading && jobs.length === 0 ? (
-          <div className="glass-panel p-10 text-center text-xs text-[#666666]">
+          <div className="glass-panel p-10 text-center text-xs text-[#71717A]">
             Loading active telemetry ledger...
           </div>
         ) : jobs.length === 0 ? (
-          <div className="glass-panel p-12 text-center text-xs text-[#666666]">
+          <div className="glass-panel p-12 text-center text-xs text-[#71717A]">
             No network captures registered.
             <div className="mt-2">
-              <Link to="/upload" className="text-xs text-[#C9A227] hover:underline">
+              <Link to="/upload" className="text-xs text-[#818CF8] hover:underline">
                 Upload a capture file to initialize forecasting
               </Link>
             </div>
           </div>
         ) : (
           <div className="glass-panel overflow-x-auto">
-            <table className="min-w-full divide-y divide-[rgba(255,255,255,0.06)] text-xs">
+            <table className="min-w-full divide-y divide-[#242943] text-xs">
               <thead>
-                <tr className="text-left text-[#666666] font-mono text-[11px]">
+                <tr className="text-left text-[#71717A] font-mono text-[11px]">
                   <th className="py-3 px-4">Session ID</th>
                   <th className="py-3 px-4">Source Telemetry</th>
                   <th className="py-3 px-4">Ingested At</th>
@@ -239,28 +239,28 @@ export default function Dashboard() {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
+              <tbody className="divide-y divide-[#242943]/60">
                 {jobs.slice(0, 6).map((job) => (
-                  <tr key={job.id} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors">
-                    <td className="py-3 px-4 font-mono text-[#666666]">
+                  <tr key={job.id} className="hover:bg-[#14182A]/50 transition-colors">
+                    <td className="py-3 px-4 font-mono text-[#71717A]">
                       {job.id.substring(0, 8)}
                     </td>
-                    <td className="py-3 px-4 font-medium text-[#F5F5F5]">
+                    <td className="py-3 px-4 font-medium text-[#F8FAFC]">
                       {job.filename}
                     </td>
-                    <td className="py-3 px-4 text-[#A1A1A1] font-mono text-[11px]">
+                    <td className="py-3 px-4 text-[#A1A1AA] font-mono text-[11px]">
                       {new Date(job.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                     </td>
                     <td className="py-3 px-4">
                       {getStatusBadge(job.status)}
                     </td>
-                    <td className="py-3 px-4 text-[#A1A1A1] font-mono">
+                    <td className="py-3 px-4 text-[#A1A1AA] font-mono">
                       {job.window_seconds}s
                     </td>
-                    <td className="py-3 px-4 text-[#A1A1A1] font-mono">
+                    <td className="py-3 px-4 text-[#A1A1AA] font-mono">
                       {job.total_flows ? job.total_flows.toLocaleString() : '-'}
                     </td>
-                    <td className="py-3 px-4 text-[#666666] font-mono">
+                    <td className="py-3 px-4 text-[#71717A] font-mono">
                       {formatBytes(job.file_size)}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
@@ -268,25 +268,25 @@ export default function Dashboard() {
                         <>
                           <Link
                             to={`/jobs/${job.id}/timeline`}
-                            className="inline-block px-2.5 py-1 text-xs rounded-sm bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] text-[#A1A1A1] hover:text-[#F5F5F5] border border-[rgba(255,255,255,0.08)] transition-all"
+                            className="inline-block px-2.5 py-1 text-xs rounded-sm bg-[#14182A] hover:bg-[#14182A]/80 text-[#A1A1AA] hover:text-[#F8FAFC] border border-[#242943] hover:border-[#818CF8]/50 transition-all font-mono"
                           >
                             Timeline
                           </Link>
                           <Link
                             to={`/jobs/${job.id}/predict`}
-                            className="inline-block px-2.5 py-1 text-xs rounded-sm bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#E0B83F] border border-[#C9A227]/30 transition-all font-medium"
+                            className="inline-block px-2.5 py-1 text-xs rounded-sm bg-[#6366F1]/10 hover:bg-[#6366F1]/20 text-[#818CF8] border border-[#6366F1]/30 transition-all font-mono font-medium"
                           >
                             Forecast
                           </Link>
                           <Link
                             to={`/jobs/${job.id}/benchmark`}
-                            className="inline-block px-2.5 py-1 text-xs rounded-sm bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] text-[#A1A1A1] hover:text-[#F5F5F5] border border-[rgba(255,255,255,0.08)] transition-all"
+                            className="inline-block px-2.5 py-1 text-xs rounded-sm bg-[#14182A] hover:bg-[#14182A]/80 text-[#A1A1AA] hover:text-[#F8FAFC] border border-[#242943] hover:border-[#818CF8]/50 transition-all font-mono"
                           >
                             Benchmark
                           </Link>
                         </>
                       ) : (
-                        <span className="text-[#666666] text-xs font-mono">Processing...</span>
+                        <span className="text-[#71717A] text-xs font-mono">Processing...</span>
                       )}
                     </td>
                   </tr>

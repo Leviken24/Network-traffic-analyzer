@@ -12,14 +12,14 @@ const Benchmark = lazy(() => import('./pages/Benchmark'));
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#050505] text-[#F5F5F5] flex flex-col antialiased selection:bg-[#C9A227]/30 selection:text-white">
+    <div className="min-h-screen bg-[#06070D] text-[#F8FAFC] flex flex-col antialiased selection:bg-[#6366F1]/30 selection:text-white">
       <NavBar />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Suspense fallback={
-          <div className="flex flex-col items-center justify-center h-72 gap-3 text-[#A1A1A1]">
-            <div className="animate-spin rounded-full h-7 w-7 border border-[rgba(255,255,255,0.1)] border-t-[#C9A227]"></div>
-            <span className="text-[11px] font-mono tracking-wider text-[#666666] uppercase">Initializing Session</span>
+          <div className="flex flex-col items-center justify-center h-72 gap-3 text-[#A1A1AA]">
+            <div className="animate-spin rounded-full h-7 w-7 border border-[#242943] border-t-[#6366F1]"></div>
+            <span className="text-[11px] font-mono tracking-wider text-[#71717A] uppercase">Initializing Session</span>
           </div>
         }>
           <Routes>

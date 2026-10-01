@@ -12,17 +12,17 @@ export default function ProtocolPie({ features }) {
   ].filter(d => d.value > 0);
 
   const COLORS = {
-    TCP: '#C9A227',    // Primary Gold
-    UDP: '#A1A1A1',    // Silver
-    ICMP: '#D64545',   // Threat / ICMP alert
-    Other: '#666666'   // Muted
+    TCP: '#6366F1',    // Primary Indigo
+    UDP: '#06B6D4',    // Cyan accent
+    ICMP: '#3B82F6',   // Secondary Blue
+    Other: '#71717A'   // Muted text color
   };
 
   const formatTooltip = (value) => `${value.toFixed(1)}%`;
 
   return (
     <div className="glass-panel p-4 h-full flex flex-col">
-      <h3 className="text-xs font-mono text-[#A1A1A1] uppercase tracking-wider mb-3">Protocol Distribution</h3>
+      <h3 className="text-xs font-mono text-[#A1A1AA] uppercase tracking-wider mb-3">Protocol Distribution</h3>
       <div className="flex-1 w-full min-h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -42,15 +42,15 @@ export default function ProtocolPie({ features }) {
             <Tooltip
               formatter={formatTooltip}
               contentStyle={{
-                backgroundColor: '#0D0D0D',
-                borderColor: 'rgba(255,255,255,0.12)',
+                backgroundColor: '#0F1220',
+                borderColor: '#242943',
                 borderRadius: '4px',
-                color: '#F5F5F5',
+                color: '#F8FAFC',
                 fontSize: '11px',
                 fontFamily: 'monospace'
               }}
             />
-            <Legend verticalAlign="bottom" height={30} iconSize={7} wrapperStyle={{ fontSize: '10px', color: '#666666', fontFamily: 'monospace' }} />
+            <Legend verticalAlign="bottom" height={30} iconSize={7} wrapperStyle={{ fontSize: '10px', color: '#71717A', fontFamily: 'monospace' }} />
           </PieChart>
         </ResponsiveContainer>
       </div>
