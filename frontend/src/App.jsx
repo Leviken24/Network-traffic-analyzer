@@ -12,13 +12,13 @@ const Benchmark = lazy(() => import('./pages/Benchmark'));
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#172033] flex flex-col antialiased">
+    <div className="min-h-screen bg-[#06070D] text-[#F8FAFC] flex flex-col antialiased">
       <NavBar />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Suspense fallback={
-          <div className="flex flex-col items-center justify-center h-64 gap-3 text-slate-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-[#0F3D56]"></div>
+          <div className="flex flex-col items-center justify-center h-64 gap-3 text-[#A1A1AA]">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#242943] border-t-[#6366F1]"></div>
             <span className="text-xs font-medium">Loading view...</span>
           </div>
         }>

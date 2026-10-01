@@ -3,21 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --bg: #F8FAFC;
-  --card: #FFFFFF;
-  --text-primary: #172033;
-  --text-secondary: #64748B;
-  --border: #E2E8F0;
-  --navy: #0F3D56;
-  --teal: #0EA5A8;
-  --amber: #F59E0B;
-  --success: #16A34A;
-  --danger: #DC2626;
+  --bg: #06070D;
+  --surface: #0B0D16;
+  --card: #0F1220;
+  --elevated: #14182A;
+  --border: #242943;
+  --indigo-primary: #6366F1;
+  --indigo-bright: #818CF8;
+  --blue-secondary: #3B82F6;
+  --cyan-accent: #06B6D4;
+  --text-primary: #F8FAFC;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --critical: #EF4444;
 }
 
 body {
-  background-color: var(--bg);
-  color: var(--text-primary);
+  background-color: #06070D;
+  color: #F8FAFC;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -25,12 +30,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Professional enterprise card */
+/* Professional enterprise dark card */
 .card {
-  background-color: #FFFFFF;
-  border: 1px solid #E2E8F0;
+  background-color: #0F1220;
+  border: 1px solid #242943;
   border-radius: 8px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Subtle scrollbars for data tables and timelines */
@@ -40,14 +45,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #0B0D16;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #242943;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #3B82F6;
 }

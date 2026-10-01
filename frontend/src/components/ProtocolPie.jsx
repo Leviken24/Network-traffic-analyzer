@@ -12,17 +12,17 @@ export default function ProtocolPie({ features }) {
   ].filter(d => d.value > 0);
 
   const COLORS = {
-    TCP: '#0F3D56',    // Navy
-    UDP: '#0EA5A8',    // Teal
-    ICMP: '#F59E0B',   // Amber
-    Other: '#94A3B8'   // Slate
+    TCP: '#6366F1',    // Primary Indigo
+    UDP: '#06B6D4',    // Cyan accent
+    ICMP: '#F59E0B',   // Warning Amber
+    Other: '#71717A'   // Muted
   };
 
   const formatTooltip = (value) => `${value.toFixed(1)}%`;
 
   return (
     <div className="card p-4 h-full flex flex-col">
-      <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">Protocol Distribution</h3>
+      <h3 className="text-xs font-semibold text-[#F8FAFC] uppercase tracking-wider mb-3">Protocol Distribution</h3>
       <div className="flex-1 w-full min-h-[220px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -42,13 +42,14 @@ export default function ProtocolPie({ features }) {
             <Tooltip
               formatter={formatTooltip}
               contentStyle={{
-                backgroundColor: '#FFFFFF',
-                borderColor: '#E2E8F0',
+                backgroundColor: '#0F1220',
+                borderColor: '#242943',
                 borderRadius: '6px',
+                color: '#F8FAFC',
                 fontSize: '12px'
               }}
             />
-            <Legend verticalAlign="bottom" height={30} iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
+            <Legend verticalAlign="bottom" height={30} iconSize={8} wrapperStyle={{ fontSize: '11px', color: '#A1A1AA' }} />
           </PieChart>
         </ResponsiveContainer>
       </div>

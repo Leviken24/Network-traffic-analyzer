@@ -31,9 +31,9 @@ export default function Timeline() {
     fetchTimeline();
   }, [jobId]);
 
-  if (loading) return <div className="text-center py-12 text-xs text-slate-500">Loading timeline telemetry...</div>;
-  if (error) return <div className="text-rose-600 text-center py-12 text-xs">Error: {error}</div>;
-  if (!data) return <div className="text-center py-12 text-xs text-slate-500">No data found</div>;
+  if (loading) return <div className="text-center py-12 text-xs text-[#71717A]">Loading timeline telemetry...</div>;
+  if (error) return <div className="text-[#EF4444] text-center py-12 text-xs">Error: {error}</div>;
+  if (!data) return <div className="text-center py-12 text-xs text-[#71717A]">No data found</div>;
 
   const { timeline, states } = data;
   const selectedState = states.find(s => s.id === selectedStateId) || states[0];
@@ -72,46 +72,46 @@ export default function Timeline() {
     <div className="space-y-6">
       {/* Back and Title Header */}
       <div>
-        <Link to="/jobs" className="text-xs text-slate-500 hover:text-[#0F3D56] mb-2 inline-flex items-center gap-1 font-medium">
+        <Link to="/jobs" className="text-xs text-[#A1A1AA] hover:text-[#F8FAFC] mb-2 inline-flex items-center gap-1 font-medium">
           <ArrowLeftIcon className="w-3.5 h-3.5" /> Back to Jobs
         </Link>
         <div className="card p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-[#0F3D56]">
+            <h1 className="text-xl font-bold text-[#F8FAFC]">
               Network State Timeline
             </h1>
-            <p className="text-xs text-slate-500 font-mono mt-0.5">Session ID: {jobId}</p>
+            <p className="text-xs text-[#71717A] font-mono mt-0.5">Session ID: {jobId}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
               to={`/jobs/${jobId}/predict`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#0F3D56] text-white text-xs font-medium hover:bg-[#164967] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] transition-colors"
             >
-              <ArrowTrendingUpIcon className="w-3.5 h-3.5 text-[#0EA5A8]" />
+              <ArrowTrendingUpIcon className="w-3.5 h-3.5 text-white" />
               Attack Forecast
             </Link>
             <Link
               to={`/jobs/${jobId}/benchmark`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-white border border-slate-300 text-slate-700 text-xs font-medium hover:bg-slate-50 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#14182A] border border-[#242943] text-[#F8FAFC] text-xs font-medium hover:bg-[#1E2337] transition-colors"
             >
-              <ScaleIcon className="w-3.5 h-3.5 text-slate-500" />
+              <ScaleIcon className="w-3.5 h-3.5 text-[#A1A1AA]" />
               Benchmark
             </Link>
           </div>
 
-          <div className="flex gap-6 text-xs border-t border-slate-100 pt-3 md:border-0 md:pt-0">
+          <div className="flex gap-6 text-xs border-t border-[#242943] pt-3 md:border-0 md:pt-0">
             <div>
-              <div className="text-slate-500">Total Packets</div>
-              <div className="font-semibold text-slate-800 text-sm">{timeline.total_packets?.toLocaleString() || 0}</div>
+              <div className="text-[#A1A1AA]">Total Packets</div>
+              <div className="font-semibold text-[#F8FAFC] text-sm">{timeline.total_packets?.toLocaleString() || 0}</div>
             </div>
             <div>
-              <div className="text-slate-500">Total Flows</div>
-              <div className="font-semibold text-slate-800 text-sm">{timeline.total_flows?.toLocaleString() || 0}</div>
+              <div className="text-[#A1A1AA]">Total Flows</div>
+              <div className="font-semibold text-[#F8FAFC] text-sm">{timeline.total_flows?.toLocaleString() || 0}</div>
             </div>
             <div>
-              <div className="text-slate-500">Time Windows</div>
-              <div className="font-semibold text-slate-800 text-sm">{states.length}</div>
+              <div className="text-[#A1A1AA]">Time Windows</div>
+              <div className="font-semibold text-[#F8FAFC] text-sm">{states.length}</div>
             </div>
           </div>
         </div>
@@ -127,16 +127,16 @@ export default function Timeline() {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-sm font-semibold text-[#0F3D56] uppercase tracking-wider">
+              <h2 className="text-sm font-semibold text-[#F8FAFC] uppercase tracking-wider">
                 Window #{selectedState.window_index} Telemetry
               </h2>
-              <p className="text-xs text-slate-500 font-mono mt-0.5">
+              <p className="text-xs text-[#71717A] font-mono mt-0.5">
                 {selectedState.window_start?.substring(11, 19)} &rarr; {selectedState.window_end?.substring(11, 19)}
               </p>
             </div>
             <Link 
               to={`/states/${selectedState.id}`}
-              className="text-xs text-[#0EA5A8] hover:text-[#0F766E] border border-slate-200 px-3 py-1.5 rounded bg-white hover:bg-slate-50 font-medium"
+              className="text-xs text-[#818CF8] hover:text-[#6366F1] border border-[#242943] px-3 py-1.5 rounded bg-[#14182A] hover:bg-[#1E2337] font-medium"
             >
               Raw State Dump &rarr;
             </Link>
@@ -144,19 +144,19 @@ export default function Timeline() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="card p-4">
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Window Packets</div>
-              <div className="text-2xl font-bold text-[#0F3D56] mt-1">{formatNumber(selectedState.features.total_packets)}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{formatNumber(selectedState.features.packets_per_second)} pkts/sec</div>
+              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">Window Packets</div>
+              <div className="text-2xl font-bold text-[#F8FAFC] mt-1">{formatNumber(selectedState.features.total_packets)}</div>
+              <div className="text-xs text-[#71717A] mt-0.5">{formatNumber(selectedState.features.packets_per_second)} pkts/sec</div>
             </div>
             <div className="card p-4">
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Window Bytes</div>
-              <div className="text-2xl font-bold text-[#0F3D56] mt-1">{formatBytes(selectedState.features.total_bytes)}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{formatBytes(selectedState.features.bytes_per_second)}/sec</div>
+              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">Window Bytes</div>
+              <div className="text-2xl font-bold text-[#F8FAFC] mt-1">{formatBytes(selectedState.features.total_bytes)}</div>
+              <div className="text-xs text-[#71717A] mt-0.5">{formatBytes(selectedState.features.bytes_per_second)}/sec</div>
             </div>
             <div className="card p-4">
-              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Active Flows</div>
-              <div className="text-2xl font-bold text-[#0F3D56] mt-1">{formatNumber(selectedState.features.active_flows)}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{formatNumber(selectedState.features.flows_per_second)} flows/sec</div>
+              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">Active Flows</div>
+              <div className="text-2xl font-bold text-[#F8FAFC] mt-1">{formatNumber(selectedState.features.active_flows)}</div>
+              <div className="text-xs text-[#71717A] mt-0.5">{formatNumber(selectedState.features.flows_per_second)} flows/sec</div>
             </div>
           </div>
 
@@ -183,28 +183,28 @@ export default function Timeline() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="card p-4">
-              <h3 className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">Top Source IPs</h3>
+              <h3 className="text-xs font-semibold text-[#F8FAFC] mb-2 uppercase tracking-wider">Top Source IPs</h3>
               <div className="flex flex-wrap gap-1.5">
                 {(selectedState.features.top_src_ips || []).map((ip, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-slate-50 text-slate-700 text-xs font-mono rounded border border-slate-200">
+                  <span key={i} className="px-2 py-0.5 bg-[#14182A] text-[#F8FAFC] text-xs font-mono rounded border border-[#242943]">
                     {ip}
                   </span>
                 ))}
                 {(!selectedState.features.top_src_ips || selectedState.features.top_src_ips.length === 0) && (
-                  <span className="text-slate-400 text-xs">None recorded</span>
+                  <span className="text-[#71717A] text-xs">None recorded</span>
                 )}
               </div>
             </div>
             <div className="card p-4">
-              <h3 className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wider">Top Destination IPs</h3>
+              <h3 className="text-xs font-semibold text-[#F8FAFC] mb-2 uppercase tracking-wider">Top Destination IPs</h3>
               <div className="flex flex-wrap gap-1.5">
                 {(selectedState.features.top_dst_ips || []).map((ip, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-slate-50 text-slate-700 text-xs font-mono rounded border border-slate-200">
+                  <span key={i} className="px-2 py-0.5 bg-[#14182A] text-[#F8FAFC] text-xs font-mono rounded border border-[#242943]">
                     {ip}
                   </span>
                 ))}
                 {(!selectedState.features.top_dst_ips || selectedState.features.top_dst_ips.length === 0) && (
-                  <span className="text-slate-400 text-xs">None recorded</span>
+                  <span className="text-[#71717A] text-xs">None recorded</span>
                 )}
               </div>
             </div>

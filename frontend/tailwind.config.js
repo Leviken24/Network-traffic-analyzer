@@ -4,42 +4,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy: {
-          50: '#F0F6F9',
-          100: '#D9E8F0',
-          200: '#B0CFE0',
-          500: '#1E5A7D',
-          600: '#164967',
-          700: '#0F3D56', // Primary Navy
-          800: '#0A2B3D',
-          900: '#061D2A',
+        dark: {
+          bg: '#06070D',
+          surface: '#0B0D16',
+          card: '#0F1220',
+          elevated: '#14182A',
+          border: '#242943',
         },
-        teal: {
-          50: '#F0FDFA',
-          100: '#CCFBF1',
-          200: '#99F6E4',
-          500: '#14B8A6',
-          600: '#0EA5A8', // Secondary Teal
-          700: '#0F766E',
-          800: '#115E59',
+        indigo: {
+          DEFAULT: '#6366F1',
+          primary: '#6366F1',
+          bright: '#818CF8',
         },
-        amber: {
-          50: '#FFFBEB',
-          100: '#FEF3C7',
-          500: '#F59E0B', // Accent Amber
-          600: '#D97706', // Warning
-          700: '#B45309',
+        blue: {
+          secondary: '#3B82F6',
         },
-        success: '#16A34A',
-        warning: '#D97706',
-        danger: '#DC2626',
-        app: {
-          bg: '#F8FAFC',
-          card: '#FFFFFF',
-          border: '#E2E8F0',
-          text: '#172033',
-          muted: '#64748B',
-          subtle: '#F1F5F9',
+        cyan: {
+          accent: '#06B6D4',
+        },
+        content: {
+          primary: '#F8FAFC',
+          secondary: '#A1A1AA',
+          muted: '#71717A',
+        },
+        status: {
+          success: '#22C55E',
+          warning: '#F59E0B',
+          critical: '#EF4444',
         }
       },
       fontFamily: {
