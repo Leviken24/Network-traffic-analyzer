@@ -4,37 +4,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          bg: '#06070D',
-          surface: '#0B0D16',
-          card: '#0F1220',
-          elevated: '#14182A',
-          border: '#242943',
+        canvas: {
+          DEFAULT: '#050505',
+          subtle: '#080808',
+          elevated: '#0D0D0D',
         },
-        indigo: {
-          DEFAULT: '#6366F1',
-          primary: '#6366F1',
-          bright: '#818CF8',
+        glass: {
+          surface: 'rgba(255, 255, 255, 0.035)',
+          elevated: 'rgba(255, 255, 255, 0.055)',
+          border: 'rgba(255, 255, 255, 0.08)',
+          'border-focus': 'rgba(201, 162, 39, 0.4)',
         },
-        blue: {
-          secondary: '#3B82F6',
+        gold: {
+          DEFAULT: '#C9A227',
+          bright: '#E0B83F',
+          deep: '#8F7417',
+          subtle: 'rgba(201, 162, 39, 0.12)',
         },
-        cyan: {
-          accent: '#06B6D4',
+        ink: {
+          primary: '#F5F5F5',
+          secondary: '#A1A1A1',
+          muted: '#666666',
         },
-        content: {
-          primary: '#F8FAFC',
-          secondary: '#A1A1AA',
-          muted: '#71717A',
-        },
-        status: {
-          success: '#22C55E',
-          warning: '#F59E0B',
-          critical: '#EF4444',
+        state: {
+          success: '#4CAF7A',
+          critical: '#D64545',
+          warning: '#C9A227',
         }
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       }
     }
   },

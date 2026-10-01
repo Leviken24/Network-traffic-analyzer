@@ -17,12 +17,12 @@ export default function TimelineSlider({ states, onSelectState, selectedStateId 
   const maxPackets = Math.max(...states.map(s => s.packet_count || 1));
 
   return (
-    <div className="card p-4">
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="text-xs font-semibold text-[#F8FAFC] uppercase tracking-wider">
+    <div className="glass-panel p-4 space-y-3">
+      <div className="flex justify-between items-center">
+        <h3 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
           Observed Time Windows
         </h3>
-        <span className="text-[11px] text-[#A1A1AA]">Select window to inspect state telemetry</span>
+        <span className="text-[10px] text-[#666666] font-mono">Select window interval to inspect telemetry</span>
       </div>
 
       <div 
@@ -38,24 +38,24 @@ export default function TimelineSlider({ states, onSelectState, selectedStateId 
               key={state.id}
               id={`state-card-${state.id}`}
               onClick={() => onSelectState(state.id)}
-              className={`flex-shrink-0 w-28 cursor-pointer rounded border p-2.5 transition-colors ${
+              className={`flex-shrink-0 w-28 cursor-pointer rounded-sm border p-2.5 transition-all ${
                 isSelected 
-                  ? 'border-[#6366F1] bg-[#14182A]' 
-                  : 'border-[#242943] bg-[#0F1220] hover:border-[#3B82F6] hover:bg-[#14182A]'
+                  ? 'border-[#C9A227] bg-[#C9A227]/10' 
+                  : 'border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.015)] hover:border-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.04)]'
               }`}
             >
-              <div className="flex justify-between items-center text-[10px] text-[#A1A1AA] mb-1">
-                <span className="font-semibold text-[#F8FAFC]">W{state.window_index}</span>
-                <span className="font-mono text-[#71717A]">{state.window_start?.substring(11, 19) || '00:00:00'}</span>
+              <div className="flex justify-between items-center text-[10px] font-mono text-[#666666] mb-1">
+                <span className={`font-semibold ${isSelected ? 'text-[#C9A227]' : 'text-[#F5F5F5]'}`}>W{state.window_index}</span>
+                <span>{state.window_start?.substring(11, 19) || '00:00:00'}</span>
               </div>
-              <div className="h-12 flex items-end mb-1.5 bg-[#0B0D16] rounded p-0.5 border border-[#242943]">
+              <div className="h-10 flex items-end mb-1.5 bg-[#050505] rounded-sm p-0.5 border border-[rgba(255,255,255,0.04)]">
                 <div 
-                  className={`w-full rounded-sm transition-all duration-200 ${isSelected ? 'bg-[#6366F1]' : 'bg-[#242943]'}`} 
+                  className={`w-full rounded-xs transition-all duration-200 ${isSelected ? 'bg-[#C9A227]' : 'bg-[rgba(255,255,255,0.18)]'}`} 
                   style={{ height: barHeight }}
                   title={`${state.packet_count} packets`}
                 ></div>
               </div>
-              <div className="text-[11px] font-mono font-medium text-center text-[#F8FAFC]">
+              <div className="text-[10px] font-mono text-center text-[#A1A1A1]">
                 {state.packet_count?.toLocaleString() || 0} pkts
               </div>
             </div>

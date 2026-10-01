@@ -31,9 +31,9 @@ export default function Timeline() {
     fetchTimeline();
   }, [jobId]);
 
-  if (loading) return <div className="text-center py-12 text-xs text-[#71717A]">Loading timeline telemetry...</div>;
-  if (error) return <div className="text-[#EF4444] text-center py-12 text-xs">Error: {error}</div>;
-  if (!data) return <div className="text-center py-12 text-xs text-[#71717A]">No data found</div>;
+  if (loading) return <div className="text-center py-16 text-xs text-[#666666] font-mono">Loading timeline telemetry...</div>;
+  if (error) return <div className="text-[#D64545] text-center py-16 text-xs font-mono">Error: {error}</div>;
+  if (!data) return <div className="text-center py-16 text-xs text-[#666666] font-mono">No data found</div>;
 
   const { timeline, states } = data;
   const selectedState = states.find(s => s.id === selectedStateId) || states[0];
@@ -69,50 +69,43 @@ export default function Timeline() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Back and Title Header */}
       <div>
-        <Link to="/jobs" className="text-xs text-[#A1A1AA] hover:text-[#F8FAFC] mb-2 inline-flex items-center gap-1 font-medium">
+        <Link to="/jobs" className="text-xs text-[#666666] hover:text-[#F5F5F5] mb-2 inline-flex items-center gap-1 font-mono transition-colors">
           <ArrowLeftIcon className="w-3.5 h-3.5" /> Back to Jobs
         </Link>
-        <div className="card p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
           <div>
-            <h1 className="text-xl font-bold text-[#F8FAFC]">
+            <div className="text-[10px] font-mono tracking-wider text-[#C9A227] uppercase mb-1">
+              Temporal Window Inspection
+            </div>
+            <h1 className="text-xl font-light text-[#F5F5F5] tracking-tight">
               Network State Timeline
             </h1>
-            <p className="text-xs text-[#71717A] font-mono mt-0.5">Session ID: {jobId}</p>
+            <p className="text-xs text-[#666666] font-mono mt-0.5">Session: {jobId}</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-4 text-xs font-mono border-t border-[rgba(255,255,255,0.06)] pt-3 md:border-0 md:pt-0">
+            <div>
+              <span className="text-[#666666]">Packets:</span>{' '}
+              <span className="text-[#F5F5F5] font-mono">{timeline.total_packets?.toLocaleString() || 0}</span>
+            </div>
+            <div>
+              <span className="text-[#666666]">Flows:</span>{' '}
+              <span className="text-[#F5F5F5] font-mono">{timeline.total_flows?.toLocaleString() || 0}</span>
+            </div>
+            <div>
+              <span className="text-[#666666]">Windows:</span>{' '}
+              <span className="text-[#F5F5F5] font-mono">{states.length}</span>
+            </div>
             <Link
               to={`/jobs/${jobId}/predict`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#E0B83F] border border-[#C9A227]/30 transition-all font-mono"
             >
-              <ArrowTrendingUpIcon className="w-3.5 h-3.5 text-white" />
-              Attack Forecast
+              <ArrowTrendingUpIcon className="w-3.5 h-3.5" />
+              Forecast
             </Link>
-            <Link
-              to={`/jobs/${jobId}/benchmark`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#14182A] border border-[#242943] text-[#F8FAFC] text-xs font-medium hover:bg-[#1E2337] transition-colors"
-            >
-              <ScaleIcon className="w-3.5 h-3.5 text-[#A1A1AA]" />
-              Benchmark
-            </Link>
-          </div>
-
-          <div className="flex gap-6 text-xs border-t border-[#242943] pt-3 md:border-0 md:pt-0">
-            <div>
-              <div className="text-[#A1A1AA]">Total Packets</div>
-              <div className="font-semibold text-[#F8FAFC] text-sm">{timeline.total_packets?.toLocaleString() || 0}</div>
-            </div>
-            <div>
-              <div className="text-[#A1A1AA]">Total Flows</div>
-              <div className="font-semibold text-[#F8FAFC] text-sm">{timeline.total_flows?.toLocaleString() || 0}</div>
-            </div>
-            <div>
-              <div className="text-[#A1A1AA]">Time Windows</div>
-              <div className="font-semibold text-[#F8FAFC] text-sm">{states.length}</div>
-            </div>
           </div>
         </div>
       </div>
@@ -125,86 +118,87 @@ export default function Timeline() {
 
       {selectedState && (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center border-b border-[rgba(255,255,255,0.06)] pb-3">
             <div>
-              <h2 className="text-sm font-semibold text-[#F8FAFC] uppercase tracking-wider">
+              <h2 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
                 Window #{selectedState.window_index} Telemetry
               </h2>
-              <p className="text-xs text-[#71717A] font-mono mt-0.5">
+              <p className="text-[11px] text-[#666666] font-mono mt-0.5">
                 {selectedState.window_start?.substring(11, 19)} &rarr; {selectedState.window_end?.substring(11, 19)}
               </p>
             </div>
             <Link 
               to={`/states/${selectedState.id}`}
-              className="text-xs text-[#818CF8] hover:text-[#6366F1] border border-[#242943] px-3 py-1.5 rounded bg-[#14182A] hover:bg-[#1E2337] font-medium"
+              className="text-[11px] text-[#C9A227] hover:underline font-mono"
             >
               Raw State Dump &rarr;
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="card p-4">
-              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">Window Packets</div>
-              <div className="text-2xl font-bold text-[#F8FAFC] mt-1">{formatNumber(selectedState.features.total_packets)}</div>
-              <div className="text-xs text-[#71717A] mt-0.5">{formatNumber(selectedState.features.packets_per_second)} pkts/sec</div>
+          {/* Window Metrics Row: Directly on page with hairline dividers */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-2 border-b border-[rgba(255,255,255,0.06)]">
+            <div>
+              <div className="text-[10px] font-mono text-[#666666] uppercase">Window Volume</div>
+              <div className="text-2xl font-light text-[#F5F5F5] font-mono mt-1">{formatNumber(selectedState.features.total_packets)} <span className="text-xs text-[#666666]">pkts</span></div>
+              <div className="text-[11px] text-[#A1A1A1] font-mono mt-0.5">{formatNumber(selectedState.features.packets_per_second)} pkts/sec</div>
             </div>
-            <div className="card p-4">
-              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">Window Bytes</div>
-              <div className="text-2xl font-bold text-[#F8FAFC] mt-1">{formatBytes(selectedState.features.total_bytes)}</div>
-              <div className="text-xs text-[#71717A] mt-0.5">{formatBytes(selectedState.features.bytes_per_second)}/sec</div>
+            <div className="sm:border-l sm:border-[rgba(255,255,255,0.06)] sm:pl-6">
+              <div className="text-[10px] font-mono text-[#666666] uppercase">Throughput Bandwidth</div>
+              <div className="text-2xl font-light text-[#F5F5F5] font-mono mt-1">{formatBytes(selectedState.features.total_bytes)}</div>
+              <div className="text-[11px] text-[#A1A1A1] font-mono mt-0.5">{formatBytes(selectedState.features.bytes_per_second)}/sec</div>
             </div>
-            <div className="card p-4">
-              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">Active Flows</div>
-              <div className="text-2xl font-bold text-[#F8FAFC] mt-1">{formatNumber(selectedState.features.active_flows)}</div>
-              <div className="text-xs text-[#71717A] mt-0.5">{formatNumber(selectedState.features.flows_per_second)} flows/sec</div>
+            <div className="sm:border-l sm:border-[rgba(255,255,255,0.06)] sm:pl-6">
+              <div className="text-[10px] font-mono text-[#666666] uppercase">Active Concurrency</div>
+              <div className="text-2xl font-light text-[#F5F5F5] font-mono mt-1">{formatNumber(selectedState.features.active_flows)} <span className="text-xs text-[#666666]">flows</span></div>
+              <div className="text-[11px] text-[#A1A1A1] font-mono mt-0.5">{formatNumber(selectedState.features.flows_per_second)} flows/sec</div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 min-h-[280px]">
+            <div className="lg:col-span-1 min-h-[260px]">
               <ProtocolPie features={selectedState.features} />
             </div>
-            <div className="lg:col-span-2 min-h-[280px]">
+            <div className="lg:col-span-2 min-h-[260px]">
               <FeatureChart title="Volume Metrics" data={volumeData} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="min-h-[280px]">
+            <div className="min-h-[260px]">
               <EntropyGauge features={selectedState.features} />
             </div>
-            <div className="min-h-[280px]">
+            <div className="min-h-[260px]">
               <FeatureChart title="TCP Flag Rates" data={tcpFlagData} />
             </div>
-            <div className="min-h-[280px]">
+            <div className="min-h-[260px]">
               <FeatureChart title="Service Mix (%)" data={serviceData} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="card p-4">
-              <h3 className="text-xs font-semibold text-[#F8FAFC] mb-2 uppercase tracking-wider">Top Source IPs</h3>
+            <div className="glass-panel p-4">
+              <h3 className="text-xs font-mono text-[#A1A1A1] mb-2 uppercase tracking-wider">Top Source IPs</h3>
               <div className="flex flex-wrap gap-1.5">
                 {(selectedState.features.top_src_ips || []).map((ip, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-[#14182A] text-[#F8FAFC] text-xs font-mono rounded border border-[#242943]">
+                  <span key={i} className="px-2 py-0.5 bg-[rgba(255,255,255,0.02)] text-[#F5F5F5] text-xs font-mono rounded-sm border border-[rgba(255,255,255,0.08)]">
                     {ip}
                   </span>
                 ))}
                 {(!selectedState.features.top_src_ips || selectedState.features.top_src_ips.length === 0) && (
-                  <span className="text-[#71717A] text-xs">None recorded</span>
+                  <span className="text-[#666666] text-xs font-mono">None recorded</span>
                 )}
               </div>
             </div>
-            <div className="card p-4">
-              <h3 className="text-xs font-semibold text-[#F8FAFC] mb-2 uppercase tracking-wider">Top Destination IPs</h3>
+            <div className="glass-panel p-4">
+              <h3 className="text-xs font-mono text-[#A1A1A1] mb-2 uppercase tracking-wider">Top Destination IPs</h3>
               <div className="flex flex-wrap gap-1.5">
                 {(selectedState.features.top_dst_ips || []).map((ip, i) => (
-                  <span key={i} className="px-2 py-0.5 bg-[#14182A] text-[#F8FAFC] text-xs font-mono rounded border border-[#242943]">
+                  <span key={i} className="px-2 py-0.5 bg-[rgba(255,255,255,0.02)] text-[#F5F5F5] text-xs font-mono rounded-sm border border-[rgba(255,255,255,0.08)]">
                     {ip}
                   </span>
                 ))}
                 {(!selectedState.features.top_dst_ips || selectedState.features.top_dst_ips.length === 0) && (
-                  <span className="text-[#71717A] text-xs">None recorded</span>
+                  <span className="text-[#666666] text-xs font-mono">None recorded</span>
                 )}
               </div>
             </div>

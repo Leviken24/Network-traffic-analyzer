@@ -19,25 +19,16 @@ export default function NavBar() {
   ];
 
   return (
-    <header className="bg-[#0B0D16] border-b border-[#242943] sticky top-0 z-50">
+    <header className="bg-[#050505]/90 backdrop-blur-md border-b border-[rgba(255,255,255,0.08)] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-14 items-center">
           {/* Brand Logo & Name */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-10">
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-8 h-8 rounded bg-[#14182A] border border-[#242943] flex items-center justify-center text-white">
-                <svg className="w-4 h-4 text-[#6366F1]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="6" cy="6" r="3" />
-                  <circle cx="18" cy="6" r="3" />
-                  <circle cx="6" cy="18" r="3" />
-                  <circle cx="18" cy="18" r="3" />
-                  <line x1="9" y1="6" x2="15" y2="6" />
-                  <line x1="9" y1="18" x2="15" y2="18" />
-                  <line x1="6" y1="9" x2="6" y2="15" />
-                  <line x1="18" y1="9" x2="18" y2="15" />
-                </svg>
+              <div className="w-5 h-5 rounded-sm bg-[#121212] border border-[rgba(255,255,255,0.15)] flex items-center justify-center">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227]"></span>
               </div>
-              <span className="font-bold text-base tracking-wide text-[#F8FAFC]">
+              <span className="font-semibold text-sm tracking-[0.18em] text-[#F5F5F5] uppercase">
                 NETFLOW
               </span>
             </Link>
@@ -50,13 +41,16 @@ export default function NavBar() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    className={`relative px-3 py-1.5 text-xs font-medium transition-colors ${
                       active
-                        ? 'bg-[#14182A] text-[#818CF8] font-semibold border border-[#242943]'
-                        : 'text-[#A1A1AA] hover:text-[#F8FAFC] hover:bg-[#14182A]'
+                        ? 'text-[#F5F5F5]'
+                        : 'text-[#A1A1A1] hover:text-[#F5F5F5]'
                     }`}
                   >
                     {item.label}
+                    {active && (
+                      <span className="absolute bottom-0 left-3 right-3 h-[1.5px] bg-[#C9A227] rounded-full"></span>
+                    )}
                   </Link>
                 );
               })}
@@ -64,24 +58,26 @@ export default function NavBar() {
           </div>
 
           {/* Right Header Area */}
-          <div className="flex items-center gap-3 text-xs text-[#71717A]">
-            <span className="text-xs text-[#71717A] font-mono">SOC Engine</span>
+          <div className="flex items-center gap-3 text-xs text-[#666666]">
+            <span className="text-[11px] font-mono tracking-wider uppercase text-[#666666]">
+              SOC Node &bull; Ready
+            </span>
           </div>
         </div>
       </div>
 
       {/* Mobile Navigation Bar */}
-      <div className="md:hidden flex overflow-x-auto px-4 py-2 border-t border-[#242943] gap-1 bg-[#0B0D16]">
+      <div className="md:hidden flex overflow-x-auto px-4 py-2 border-t border-[rgba(255,255,255,0.08)] gap-2 bg-[#080808]">
         {navItems.map((item) => {
           const active = isActive(item.path);
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`whitespace-nowrap px-2.5 py-1 rounded text-xs font-medium ${
+              className={`whitespace-nowrap px-2.5 py-1 text-xs font-medium transition-colors ${
                 active
-                  ? 'bg-[#14182A] text-[#818CF8] font-semibold border border-[#242943]'
-                  : 'text-[#A1A1AA] hover:text-[#F8FAFC]'
+                  ? 'text-[#F5F5F5] border-b border-[#C9A227]'
+                  : 'text-[#A1A1A1] hover:text-[#F5F5F5]'
               }`}
             >
               {item.label}

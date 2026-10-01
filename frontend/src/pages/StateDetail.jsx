@@ -24,24 +24,24 @@ export default function StateDetail() {
     fetchState();
   }, [stateId]);
 
-  if (loading) return <div className="text-center py-12 text-xs text-[#71717A]">Loading state telemetry...</div>;
-  if (error) return <div className="text-[#EF4444] text-center py-12 text-xs">Error: {error}</div>;
-  if (!stateData) return <div className="text-center py-12 text-xs text-[#71717A]">No data found</div>;
+  if (loading) return <div className="text-center py-16 text-xs text-[#666666] font-mono">Loading state telemetry vector...</div>;
+  if (error) return <div className="text-[#D64545] text-center py-16 text-xs font-mono">Error: {error}</div>;
+  if (!stateData) return <div className="text-center py-16 text-xs text-[#666666] font-mono">No data found</div>;
 
   const f = stateData.features || {};
 
   const formatNum = (val) => typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 4 }) : 'N/A';
 
   const DataRow = ({ label, value }) => (
-    <div className="flex justify-between py-1.5 border-b border-[#242943] last:border-0 text-xs">
-      <span className="text-[#A1A1AA]">{label}</span>
-      <span className="text-[#F8FAFC] font-mono font-medium">{value}</span>
+    <div className="flex justify-between py-1.5 border-b border-[rgba(255,255,255,0.04)] last:border-0 text-xs font-mono">
+      <span className="text-[#A1A1A1]">{label}</span>
+      <span className="text-[#F5F5F5]">{value}</span>
     </div>
   );
 
   const Section = ({ title, children }) => (
-    <div className="card p-4">
-      <h3 className="text-xs font-semibold text-[#F8FAFC] uppercase tracking-wider mb-3 pb-2 border-b border-[#242943]">{title}</h3>
+    <div className="glass-panel p-4">
+      <h3 className="text-xs font-mono text-[#C9A227] uppercase tracking-wider mb-3 pb-2 border-b border-[rgba(255,255,255,0.06)]">{title}</h3>
       <div className="flex flex-col">
         {children}
       </div>
@@ -50,21 +50,24 @@ export default function StateDetail() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
         <div>
           <button 
             onClick={() => navigate(-1)} 
-            className="text-xs text-[#A1A1AA] hover:text-[#F8FAFC] mb-2 inline-flex items-center gap-1 font-medium"
+            className="text-xs text-[#666666] hover:text-[#F5F5F5] mb-2 inline-flex items-center gap-1 font-mono transition-colors"
           >
             <ArrowLeftIcon className="w-3.5 h-3.5" /> Back to Timeline
           </button>
-          <h1 className="text-xl font-bold text-[#F8FAFC]">Network State Telemetry</h1>
-          <p className="text-xs text-[#71717A] font-mono mt-0.5">State ID: {stateId}</p>
+          <div className="text-[10px] font-mono tracking-wider text-[#C9A227] uppercase mb-1">
+            Raw State Vector
+          </div>
+          <h1 className="text-xl font-light text-[#F5F5F5] tracking-tight">Window Telemetry Inspector</h1>
+          <p className="text-xs text-[#666666] font-mono mt-0.5">ID: {stateId}</p>
         </div>
 
-        <div className="bg-[#0F1220] border border-[#242943] px-3.5 py-2 rounded text-right text-xs">
-          <div className="text-[#71717A] font-medium">Window #{stateData.window_index}</div>
-          <div className="font-mono text-[#F8FAFC] font-medium">{stateData.window_start?.substring(0, 19).replace('T', ' ')}</div>
+        <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] px-3.5 py-2 rounded-sm text-right text-xs font-mono">
+          <div className="text-[#666666]">Window #{stateData.window_index}</div>
+          <div className="text-[#F5F5F5]">{stateData.window_start?.substring(0, 19).replace('T', ' ')}</div>
         </div>
       </div>
 
@@ -84,7 +87,7 @@ export default function StateDetail() {
           <DataRow label="Flows/sec" value={formatNum(f.flows_per_second)} />
         </Section>
 
-        <Section title="Protocol Distribution (Ratio)">
+        <Section title="Protocol Distribution">
           <DataRow label="TCP Ratio" value={formatNum(f.tcp_ratio)} />
           <DataRow label="UDP Ratio" value={formatNum(f.udp_ratio)} />
           <DataRow label="ICMP Ratio" value={formatNum(f.icmp_ratio)} />
@@ -126,22 +129,22 @@ export default function StateDetail() {
           <Section title="Top Source IPs">
             <div className="flex flex-col gap-1">
               {(f.top_src_ips || []).map((ip, i) => (
-                <div key={i} className="text-xs font-mono bg-[#14182A] px-2 py-1 rounded text-[#F8FAFC] border border-[#242943]">
+                <div key={i} className="text-xs font-mono bg-[rgba(255,255,255,0.02)] px-2 py-1 rounded-sm text-[#F5F5F5] border border-[rgba(255,255,255,0.06)]">
                   {ip}
                 </div>
               ))}
-              {(!f.top_src_ips || f.top_src_ips.length === 0) && <div className="text-xs text-[#71717A]">None recorded</div>}
+              {(!f.top_src_ips || f.top_src_ips.length === 0) && <div className="text-xs text-[#666666] font-mono">None recorded</div>}
             </div>
           </Section>
 
           <Section title="Top Destination IPs">
             <div className="flex flex-col gap-1">
               {(f.top_dst_ips || []).map((ip, i) => (
-                <div key={i} className="text-xs font-mono bg-[#14182A] px-2 py-1 rounded text-[#F8FAFC] border border-[#242943]">
+                <div key={i} className="text-xs font-mono bg-[rgba(255,255,255,0.02)] px-2 py-1 rounded-sm text-[#F5F5F5] border border-[rgba(255,255,255,0.06)]">
                   {ip}
                 </div>
               ))}
-              {(!f.top_dst_ips || f.top_dst_ips.length === 0) && <div className="text-xs text-[#71717A]">None recorded</div>}
+              {(!f.top_dst_ips || f.top_dst_ips.length === 0) && <div className="text-xs text-[#666666] font-mono">None recorded</div>}
             </div>
           </Section>
         </div>

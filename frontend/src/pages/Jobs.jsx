@@ -28,13 +28,13 @@ export default function Jobs() {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'DONE':
-        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#14182A] text-[#22C55E] border border-[#22C55E]/30">Completed</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#4CAF7A] font-mono"><span className="w-1.5 h-1.5 rounded-full bg-[#4CAF7A]"></span>Completed</span>;
       case 'PROCESSING':
-        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#14182A] text-[#F59E0B] border border-[#F59E0B]/30 animate-pulse">Processing</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#C9A227] font-mono animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-[#C9A227]"></span>Processing</span>;
       case 'FAILED':
-        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#14182A] text-[#EF4444] border border-[#EF4444]/30">Failed</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#D64545] font-mono"><span className="w-1.5 h-1.5 rounded-full bg-[#D64545]"></span>Failed</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#14182A] text-[#A1A1AA] border border-[#242943]">Pending</span>;
+        return <span className="inline-flex items-center gap-1.5 text-xs text-[#666666] font-mono">Pending</span>;
     }
   };
 
@@ -49,77 +49,82 @@ export default function Jobs() {
   return (
     <div className="space-y-6">
       {/* Title & Action */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
         <div>
-          <h1 className="text-xl font-bold text-[#F8FAFC]">
-            Jobs & Timelines
+          <div className="text-[10px] font-mono tracking-wider text-[#C9A227] uppercase mb-1">
+            Telemetry Registry
+          </div>
+          <h1 className="text-xl font-light text-[#F5F5F5] tracking-tight">
+            Jobs & Temporal Timelines
           </h1>
-          <p className="text-xs text-[#A1A1AA] mt-0.5">
-            Historical telemetry ingestion logs and state extraction jobs
+          <p className="text-xs text-[#A1A1A1] mt-0.5">
+            Historical packet capture records, extracted flow sessions, and sequential model states.
           </p>
         </div>
 
         <Link
           to="/upload"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-[#6366F1] text-white text-xs font-medium hover:bg-[#4F46E5] transition-colors"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm bg-[#121212] border border-[#C9A227]/50 text-[#F5F5F5] text-xs font-medium hover:border-[#C9A227] hover:bg-[#181818] transition-all self-start sm:self-auto"
         >
-          <ArrowUpTrayIcon className="w-3.5 h-3.5 text-white" />
-          New Telemetry Upload
+          <ArrowUpTrayIcon className="w-3.5 h-3.5 text-[#C9A227]" />
+          Import Telemetry
         </Link>
       </div>
 
       {/* Main Table Card */}
-      <div className="card overflow-hidden">
+      <div className="glass-panel overflow-hidden">
         {loading && jobs.length === 0 ? (
-          <div className="p-8 text-center text-xs text-[#71717A]">Loading jobs...</div>
+          <div className="p-8 text-center text-xs text-[#666666] font-mono">
+            Loading registry entries...
+          </div>
         ) : jobs.length === 0 ? (
-          <div className="p-12 text-center text-xs text-[#71717A]">
-            No telemetry jobs found. Upload a capture file to begin.
+          <div className="p-12 text-center text-xs text-[#666666]">
+            No telemetry jobs found. Import a capture to begin analysis.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#242943] text-xs">
-              <thead className="bg-[#0B0D16]">
-                <tr className="text-left text-[#A1A1AA] font-medium">
-                  <th scope="col" className="py-3 px-4">Job</th>
-                  <th scope="col" className="py-3 px-4">File</th>
-                  <th scope="col" className="py-3 px-4">Created</th>
+            <table className="min-w-full divide-y divide-[rgba(255,255,255,0.06)] text-xs">
+              <thead>
+                <tr className="text-left text-[#666666] font-mono text-[11px]">
+                  <th scope="col" className="py-3 px-4">Job ID</th>
+                  <th scope="col" className="py-3 px-4">Source Telemetry</th>
+                  <th scope="col" className="py-3 px-4">Ingested At</th>
                   <th scope="col" className="py-3 px-4">Status</th>
                   <th scope="col" className="py-3 px-4">Flows</th>
                   <th scope="col" className="py-3 px-4">Risk</th>
-                  <th scope="col" className="py-3 px-4 text-right">Action</th>
+                  <th scope="col" className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#242943]">
+              <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
                 {jobs.map((job) => (
                   <tr 
                     key={job.id} 
-                    className="hover:bg-[#14182A]/60 transition-colors"
+                    className="hover:bg-[rgba(255,255,255,0.02)] transition-colors"
                   >
-                    <td className="py-3 px-4 font-mono text-[#71717A]">
+                    <td className="py-3 px-4 font-mono text-[#666666]">
                       {job.id.substring(0, 8)}
                     </td>
-                    <td className="py-3 px-4 font-medium text-[#F8FAFC]">
+                    <td className="py-3 px-4 font-medium text-[#F5F5F5]">
                       {job.filename}
-                      <span className="text-[#71717A] font-normal ml-2">({formatSize(job.file_size)})</span>
+                      <span className="text-[#666666] font-mono text-[11px] ml-2">({formatSize(job.file_size)})</span>
                     </td>
-                    <td className="py-3 px-4 text-[#A1A1AA]">
+                    <td className="py-3 px-4 text-[#A1A1A1] font-mono text-[11px]">
                       {new Date(job.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                     </td>
                     <td className="py-3 px-4">
                       {getStatusBadge(job.status)}
                     </td>
-                    <td className="py-3 px-4 text-[#A1A1AA] font-mono">
+                    <td className="py-3 px-4 text-[#A1A1A1] font-mono">
                       {job.total_flows ? job.total_flows.toLocaleString() : '-'}
                     </td>
                     <td className="py-3 px-4">
                       {job.status === 'DONE' ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs text-[#F8FAFC]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]"></span>
+                        <span className="inline-flex items-center gap-1.5 text-xs text-[#F5F5F5] font-mono">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227]"></span>
                           Monitored
                         </span>
                       ) : (
-                        <span className="text-[#71717A]">-</span>
+                        <span className="text-[#666666] font-mono">-</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-right space-x-2">
@@ -127,25 +132,25 @@ export default function Jobs() {
                         <>
                           <Link
                             to={`/jobs/${job.id}/timeline`}
-                            className="inline-block px-2.5 py-1 rounded bg-[#14182A] hover:bg-[#1E2337] text-[#F8FAFC] font-medium border border-[#242943] transition-colors"
+                            className="inline-block px-2.5 py-1 rounded-sm bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] text-[#A1A1A1] hover:text-[#F5F5F5] border border-[rgba(255,255,255,0.08)] transition-all font-mono text-[11px]"
                           >
-                            View
+                            Timeline
                           </Link>
                           <Link
                             to={`/jobs/${job.id}/predict`}
-                            className="inline-block px-2.5 py-1 rounded bg-[#6366F1]/15 hover:bg-[#6366F1]/25 text-[#818CF8] border border-[#6366F1]/40 font-medium transition-colors"
+                            className="inline-block px-2.5 py-1 rounded-sm bg-[#C9A227]/10 hover:bg-[#C9A227]/20 text-[#E0B83F] border border-[#C9A227]/30 font-medium transition-all font-mono text-[11px]"
                           >
                             Forecast
                           </Link>
                           <Link
                             to={`/jobs/${job.id}/benchmark`}
-                            className="inline-block px-2.5 py-1 rounded bg-[#14182A] hover:bg-[#1E2337] text-[#F8FAFC] font-medium border border-[#242943] transition-colors"
+                            className="inline-block px-2.5 py-1 rounded-sm bg-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.08)] text-[#A1A1A1] hover:text-[#F5F5F5] border border-[rgba(255,255,255,0.08)] transition-all font-mono text-[11px]"
                           >
-                            Details
+                            Benchmark
                           </Link>
                         </>
                       ) : (
-                        <span className="text-[#71717A]">Processing...</span>
+                        <span className="text-[#666666] text-xs font-mono">Processing...</span>
                       )}
                     </td>
                   </tr>

@@ -3,56 +3,64 @@
 @tailwind utilities;
 
 :root {
-  --bg: #06070D;
-  --surface: #0B0D16;
-  --card: #0F1220;
-  --elevated: #14182A;
-  --border: #242943;
-  --indigo-primary: #6366F1;
-  --indigo-bright: #818CF8;
-  --blue-secondary: #3B82F6;
-  --cyan-accent: #06B6D4;
-  --text-primary: #F8FAFC;
-  --text-secondary: #A1A1AA;
-  --text-muted: #71717A;
-  --success: #22C55E;
-  --warning: #F59E0B;
-  --critical: #EF4444;
+  --canvas: #050505;
+  --canvas-subtle: #080808;
+  --canvas-elevated: #0D0D0D;
+  --glass-surface: rgba(255, 255, 255, 0.035);
+  --glass-elevated: rgba(255, 255, 255, 0.055);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --gold: #C9A227;
+  --gold-bright: #E0B83F;
+  --gold-deep: #8F7417;
+  --ink-primary: #F5F5F5;
+  --ink-secondary: #A1A1A1;
+  --ink-muted: #666666;
+  --success: #4CAF7A;
+  --critical: #D64545;
 }
 
 body {
-  background-color: #06070D;
-  color: #F8FAFC;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #050505;
+  color: #F5F5F5;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Professional enterprise dark card */
-.card {
-  background-color: #0F1220;
-  border: 1px solid #242943;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+/* Restrained dark glass panel */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
 }
 
-/* Subtle scrollbars for data tables and timelines */
+.glass-panel-elevated {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 6px;
+}
+
+/* Subtle scrollbars for observability tables and timelines */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0B0D16;
+  background: #080808;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #242943;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3B82F6;
+  background: #C9A227;
 }

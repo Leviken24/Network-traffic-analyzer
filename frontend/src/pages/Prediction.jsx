@@ -84,11 +84,11 @@ export default function Prediction() {
     navigate(`/jobs/${newId}/predict`);
   };
 
-  // Severity color calculation
+  // Analytical risk severity categorization
   const getRiskLevel = (risk) => {
-    if (risk >= 0.7) return { label: 'Critical', colorText: 'text-[#EF4444]', colorBg: 'bg-[#EF4444]/10', colorBorder: 'border-[#EF4444]/30' };
-    if (risk >= 0.3) return { label: 'Elevated', colorText: 'text-[#F59E0B]', colorBg: 'bg-[#F59E0B]/10', colorBorder: 'border-[#F59E0B]/30' };
-    return { label: 'Normal', colorText: 'text-[#22C55E]', colorBg: 'bg-[#22C55E]/10', colorBorder: 'border-[#22C55E]/30' };
+    if (risk >= 0.7) return { label: 'Critical', colorText: 'text-[#D64545]', colorBg: 'bg-[#D64545]/10', colorBorder: 'border-[#D64545]/30' };
+    if (risk >= 0.3) return { label: 'Elevated', colorText: 'text-[#C9A227]', colorBg: 'bg-[#C9A227]/10', colorBorder: 'border-[#C9A227]/30' };
+    return { label: 'Normal', colorText: 'text-[#4CAF7A]', colorBg: 'bg-[#4CAF7A]/10', colorBorder: 'border-[#4CAF7A]/30' };
   };
 
   const getMitigationPlan = (stageIdx) => {
@@ -125,7 +125,7 @@ export default function Prediction() {
     }
   };
 
-  // Prepare chart series: combine historical timeline + forecast projection
+  // Dual series chart preparation: Observed (solid silver) vs Forecast (dashed gold)
   const chartData = [];
   if (prediction?.state_timeline) {
     prediction.state_timeline.forEach((item) => {
@@ -164,29 +164,32 @@ export default function Prediction() {
     "Command & Control / Exfil"
   ];
 
-  const currentRiskInfo = prediction ? getRiskLevel(prediction.current_risk) : { label: 'Normal', colorText: 'text-[#F8FAFC]', colorBg: 'bg-[#14182A]', colorBorder: 'border-[#242943]' };
+  const currentRiskInfo = prediction ? getRiskLevel(prediction.current_risk) : { label: 'Normal', colorText: 'text-[#F5F5F5]', colorBg: 'bg-[rgba(255,255,255,0.04)]', colorBorder: 'border-[rgba(255,255,255,0.08)]' };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header & Controls Bar */}
-      <div className="bg-[#0F1220] border border-[#242943] rounded-lg p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-5">
         <div>
-          <h1 className="text-xl font-bold text-[#F8FAFC]">
-            Attack Forecasting
+          <div className="text-[10px] font-mono tracking-wider text-[#C9A227] uppercase mb-1">
+            Latent Trajectory Forecasting
+          </div>
+          <h1 className="text-xl font-light text-[#F5F5F5] tracking-tight">
+            Attack Progression & Multi-Horizon Projection
           </h1>
-          <p className="text-xs text-[#A1A1AA] mt-0.5">
-            Temporal risk trajectory and attack stage projection
+          <p className="text-xs text-[#A1A1A1] mt-0.5">
+            Sequential state tracking across time windows to project anticipated risk and attack progression.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <label className="text-xs text-[#A1A1AA] font-medium">Session:</label>
+          <label className="text-xs text-[#666666] font-mono">Session:</label>
           <select
             value={selectedJobId}
             onChange={handleJobChange}
-            className="bg-[#14182A] border border-[#242943] rounded px-2.5 py-1.5 text-xs text-[#F8FAFC] focus:outline-none focus:ring-1 focus:ring-[#6366F1]"
+            className="bg-[#0D0D0D] border border-[rgba(255,255,255,0.12)] rounded-sm px-2.5 py-1.5 text-xs text-[#F5F5F5] font-mono focus:outline-none focus:border-[#C9A227]"
           >
-            {jobs.length === 0 && <option value="">No completed jobs</option>}
+            {jobs.length === 0 && <option value="">No completed captures</option>}
             {jobs.map((j) => (
               <option key={j.id} value={j.id}>
                 {j.filename} ({j.window_seconds}s window)
@@ -196,7 +199,7 @@ export default function Prediction() {
           {selectedJobId && (
             <Link
               to={`/jobs/${selectedJobId}/timeline`}
-              className="px-3 py-1.5 text-xs border border-[#242943] rounded text-[#F8FAFC] hover:bg-[#14182A] font-medium transition-colors"
+              className="px-3 py-1.5 text-xs border border-[rgba(255,255,255,0.1)] rounded-sm text-[#A1A1A1] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.04)] font-mono transition-colors"
             >
               Timeline
             </Link>
@@ -204,7 +207,7 @@ export default function Prediction() {
           {selectedJobId && (
             <Link
               to={`/jobs/${selectedJobId}/benchmark`}
-              className="px-3 py-1.5 text-xs border border-[#242943] rounded text-[#F8FAFC] hover:bg-[#14182A] font-medium transition-colors"
+              className="px-3 py-1.5 text-xs border border-[rgba(255,255,255,0.1)] rounded-sm text-[#A1A1A1] hover:text-[#F5F5F5] hover:bg-[rgba(255,255,255,0.04)] font-mono transition-colors"
             >
               Benchmark
             </Link>
@@ -212,12 +215,12 @@ export default function Prediction() {
         </div>
       </div>
 
-      {/* Sliders for Context & Forecast Horizon */}
+      {/* Sliders Bar for Context & Forecast Horizon */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4">
+        <div className="glass-panel p-4">
           <div className="flex justify-between items-center mb-1 text-xs">
-            <span className="font-medium text-[#F8FAFC]">Context Window</span>
-            <span className="font-semibold text-[#818CF8]">{sequenceLength} states</span>
+            <span className="text-[#A1A1A1]">Context Window Length</span>
+            <span className="font-mono text-[#F5F5F5]">{sequenceLength} states</span>
           </div>
           <input
             type="range"
@@ -226,15 +229,15 @@ export default function Prediction() {
             step="1"
             value={sequenceLength}
             onChange={(e) => setSequenceLength(Number(e.target.value))}
-            className="w-full h-1.5 bg-[#242943] rounded-lg appearance-none cursor-pointer accent-[#6366F1]"
+            className="w-full h-1 bg-[rgba(255,255,255,0.1)] rounded appearance-none cursor-pointer accent-[#C9A227]"
           />
-          <div className="text-[11px] text-[#71717A] mt-1">Number of historical windows evaluated</div>
+          <div className="text-[10px] text-[#666666] font-mono mt-1">Number of consecutive historical state vectors in GRU memory</div>
         </div>
 
-        <div className="card p-4">
+        <div className="glass-panel p-4">
           <div className="flex justify-between items-center mb-1 text-xs">
-            <span className="font-medium text-[#F8FAFC]">Forecast Horizon</span>
-            <span className="font-semibold text-[#06B6D4]">+{forecastSteps} windows</span>
+            <span className="text-[#A1A1A1]">Forecast Projection Horizon</span>
+            <span className="font-mono text-[#C9A227]">+{forecastSteps} windows</span>
           </div>
           <input
             type="range"
@@ -243,20 +246,20 @@ export default function Prediction() {
             step="1"
             value={forecastSteps}
             onChange={(e) => setForecastSteps(Number(e.target.value))}
-            className="w-full h-1.5 bg-[#242943] rounded-lg appearance-none cursor-pointer accent-[#06B6D4]"
+            className="w-full h-1 bg-[rgba(255,255,255,0.1)] rounded appearance-none cursor-pointer accent-[#C9A227]"
           />
-          <div className="text-[11px] text-[#71717A] mt-1">Future window states projected into horizon</div>
+          <div className="text-[10px] text-[#666666] font-mono mt-1">Number of future time steps projected into horizon</div>
         </div>
       </div>
 
       {loading && (
-        <div className="card p-12 text-center text-[#71717A] text-xs">
-          Computing temporal risk projection...
+        <div className="glass-panel p-16 text-center text-[#666666] text-xs font-mono">
+          Evaluating sequence latent trajectory...
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-[#EF4444]/10 border border-[#EF4444]/30 rounded text-[#EF4444] text-xs flex items-center gap-2">
+        <div className="p-4 bg-[#D64545]/10 border border-[#D64545]/30 rounded text-[#D64545] text-xs font-mono flex items-center gap-2">
           <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -264,26 +267,26 @@ export default function Prediction() {
 
       {prediction && !loading && (
         <>
-          {/* Executive Overview Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Posture Indicators: Crisp analytical summary line */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 py-2 border-b border-[rgba(255,255,255,0.06)]">
             {/* Current Risk */}
-            <div className="card p-5">
-              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
-                Current Risk
+            <div>
+              <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+                Observed Network Risk
               </div>
-              <div className="flex items-baseline gap-2 mt-2">
-                <span className="text-2xl font-bold text-[#F8FAFC]">
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl font-light text-[#F5F5F5] font-mono">
                   {Math.round(prediction.current_risk * 100)}%
                 </span>
-                <span className={`px-2 py-0.5 rounded text-xs font-medium border ${currentRiskInfo.colorBg} ${currentRiskInfo.colorText} ${currentRiskInfo.colorBorder}`}>
+                <span className={`px-2 py-0.5 rounded-sm text-[10px] font-mono border ${currentRiskInfo.colorBg} ${currentRiskInfo.colorText} ${currentRiskInfo.colorBorder}`}>
                   {currentRiskInfo.label}
                 </span>
               </div>
-              <div className="w-full bg-[#242943] rounded-full h-1.5 mt-3">
+              <div className="w-full bg-[rgba(255,255,255,0.08)] rounded-full h-1 mt-2">
                 <div
-                  className={`h-1.5 rounded-full ${
-                    prediction.current_risk >= 0.7 ? 'bg-[#EF4444]' :
-                    prediction.current_risk >= 0.3 ? 'bg-[#F59E0B]' : 'bg-[#22C55E]'
+                  className={`h-1 rounded-full ${
+                    prediction.current_risk >= 0.7 ? 'bg-[#D64545]' :
+                    prediction.current_risk >= 0.3 ? 'bg-[#C9A227]' : 'bg-[#4CAF7A]'
                   }`}
                   style={{ width: `${Math.min(prediction.current_risk * 100, 100)}%` }}
                 />
@@ -291,115 +294,116 @@ export default function Prediction() {
             </div>
 
             {/* Predicted Stage */}
-            <div className="card p-5">
-              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
-                Predicted Stage
+            <div className="border-l border-[rgba(255,255,255,0.06)] pl-6">
+              <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+                Predicted Attack Phase
               </div>
-              <div className="text-base font-bold text-[#F8FAFC] mt-2">
+              <div className="text-base font-normal text-[#F5F5F5] mt-1">
                 {prediction.current_stage_label || prediction.stage_label}
               </div>
-              <div className="text-xs text-[#71717A] mt-1">
-                Phase {prediction.current_stage} of 4
+              <div className="text-[11px] text-[#A1A1A1] mt-0.5 font-mono">
+                Phase {prediction.current_stage} of 4 &bull; MITRE Mapping
               </div>
             </div>
 
             {/* Confidence */}
-            <div className="card p-5">
-              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
-                Model Confidence
+            <div className="border-l border-[rgba(255,255,255,0.06)] pl-6">
+              <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+                Model Latent Confidence
               </div>
-              <div className="text-2xl font-bold text-[#F8FAFC] mt-2">
+              <div className="text-2xl font-light text-[#F5F5F5] font-mono mt-1">
                 {Math.round(prediction.stage_confidence * 100)}%
               </div>
-              <div className="text-xs text-[#71717A] mt-1">
-                Based on sequence trajectory
+              <div className="text-[11px] text-[#A1A1A1] mt-0.5">
+                Sequential trajectory certainty
               </div>
             </div>
 
-            {/* Forecast Steps Breakdown */}
-            <div className="card p-5">
-              <div className="text-[11px] font-semibold text-[#A1A1AA] uppercase tracking-wider">
-                Forecast Summary
+            {/* Horizon Outlook */}
+            <div className="border-l border-[rgba(255,255,255,0.06)] pl-6">
+              <div className="text-[10px] font-mono tracking-wider text-[#666666] uppercase">
+                Horizon Outlook
               </div>
-              <div className="mt-2 space-y-1">
+              <div className="mt-1 space-y-0.5">
                 {prediction.forecast && prediction.forecast.slice(0, 3).map((f) => (
-                  <div key={f.step} className="flex justify-between text-xs">
-                    <span className="text-[#A1A1AA]">{f.label} ({f.stage_label})</span>
-                    <span className="font-medium text-[#F8FAFC]">{Math.round(f.risk * 100)}%</span>
+                  <div key={f.step} className="flex justify-between text-[11px] font-mono">
+                    <span className="text-[#666666]">{f.label}:</span>
+                    <span className="text-[#F5F5F5]">{Math.round(f.risk * 100)}% ({f.stage_label})</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Timeline Chart */}
-          <div className="card p-5">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 border-b border-[#242943] pb-3">
+          {/* Timeline Chart: Observed vs Projected Forecast */}
+          <div className="glass-panel p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-[rgba(255,255,255,0.06)] pb-3">
               <div>
-                <h2 className="text-sm font-semibold text-[#F8FAFC] uppercase tracking-wider">
-                  Forecast Timeline
+                <h2 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
+                  State Sequence & Forecast Trajectory
                 </h2>
-                <p className="text-xs text-[#71717A] mt-0.5">
-                  Observed historical state sequence vs. predicted future trajectory
+                <p className="text-[11px] text-[#666666] mt-0.5">
+                  Observed historical state series vs. multi-step latent projected trajectory
                 </p>
               </div>
-              <div className="flex items-center gap-4 text-xs">
-                <span className="flex items-center gap-1.5 text-[#F8FAFC]">
-                  <span className="w-3 h-0.5 bg-[#6366F1] inline-block"></span> Observed
+              <div className="flex items-center gap-5 text-[11px] font-mono">
+                <span className="flex items-center gap-1.5 text-[#A1A1A1]">
+                  <span className="w-3 h-0.5 bg-[#A1A1A1] inline-block"></span> Observed
                 </span>
-                <span className="flex items-center gap-1.5 text-[#06B6D4]">
-                  <span className="w-3 h-0.5 bg-[#06B6D4] border-b border-dashed border-[#06B6D4] inline-block"></span> Predicted
+                <span className="flex items-center gap-1.5 text-[#C9A227]">
+                  <span className="w-3 h-0.5 bg-[#C9A227] border-b border-dashed border-[#C9A227] inline-block"></span> Projected Forecast
                 </span>
-                <span className="flex items-center gap-1.5 text-[#EF4444]">
-                  <span className="w-3 h-0.5 bg-[#EF4444] border-b border-dashed border-[#EF4444] inline-block"></span> Critical (70%)
+                <span className="flex items-center gap-1.5 text-[#D64545]">
+                  <span className="w-3 h-0.5 bg-[#D64545] border-b border-dashed border-[#D64545] inline-block"></span> Critical Threshold (70%)
                 </span>
               </div>
             </div>
 
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#242943" />
-                  <XAxis dataKey="name" stroke="#71717A" tick={{ fontSize: 11 }} />
-                  <YAxis domain={[0, 100]} stroke="#71717A" tick={{ fontSize: 11 }} unit="%" />
+                <LineChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.06)" />
+                  <XAxis dataKey="name" stroke="#666666" tick={{ fill: '#666666', fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} stroke="#666666" tick={{ fill: '#666666', fontSize: 11 }} unit="%" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0F1220',
-                      borderColor: '#242943',
-                      borderRadius: '6px',
-                      color: '#F8FAFC',
-                      fontSize: '12px',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                      backgroundColor: '#0D0D0D',
+                      borderColor: 'rgba(255,255,255,0.12)',
+                      borderRadius: '4px',
+                      color: '#F5F5F5',
+                      fontSize: '11px',
+                      fontFamily: 'monospace',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
                     }}
                   />
-                  <ReferenceLine y={70} stroke="#EF4444" strokeDasharray="3 3" />
+                  <ReferenceLine y={70} stroke="#D64545" strokeDasharray="3 3" />
                   <Line
                     type="monotone"
                     dataKey="observedRisk"
                     name="Observed Risk"
-                    stroke="#6366F1"
-                    strokeWidth={2}
-                    dot={{ fill: '#6366F1', r: 3 }}
+                    stroke="#A1A1A1"
+                    strokeWidth={1.5}
+                    dot={{ fill: '#A1A1A1', r: 2.5 }}
                     connectNulls={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="forecastRisk"
                     name="Predicted Risk"
-                    stroke="#06B6D4"
+                    stroke="#C9A227"
                     strokeWidth={2}
                     strokeDasharray="4 4"
-                    dot={{ fill: '#06B6D4', r: 3 }}
+                    dot={{ fill: '#C9A227', r: 3 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Attack Stage Progression */}
-          <div className="card p-5">
-            <h2 className="text-sm font-semibold text-[#F8FAFC] uppercase tracking-wider mb-3">
-              Attack Stage Progression
+          {/* Kill-Chain Progression Rail */}
+          <div className="space-y-3">
+            <h2 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
+              Kill-Chain Progression Rail
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
               {STAGE_NAMES.map((name, idx) => {
@@ -410,26 +414,26 @@ export default function Prediction() {
                 return (
                   <div
                     key={idx}
-                    className={`p-3 rounded border text-xs ${
+                    className={`p-3 rounded-sm border text-xs transition-all ${
                       isCurrent
-                        ? 'border-[#6366F1] bg-[#14182A] text-[#F8FAFC] font-medium'
+                        ? 'border-[#C9A227] bg-[#C9A227]/10'
                         : isPast
-                        ? 'border-[#242943] bg-[#0B0D16] text-[#71717A]'
+                        ? 'border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.015)] text-[#666666]'
                         : isFuturePredicted
-                        ? 'border-[#F59E0B]/40 bg-[#F59E0B]/10 text-[#F8FAFC]'
-                        : 'border-[#242943] bg-[#0F1220] text-[#71717A]'
+                        ? 'border-[#C9A227]/40 bg-[rgba(201,162,39,0.05)] text-[#F5F5F5]'
+                        : 'border-[rgba(255,255,255,0.06)] bg-[#050505] text-[#666666]'
                     }`}
                   >
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] text-[#71717A] uppercase font-mono">Stage {idx}</span>
+                      <span className="text-[10px] text-[#666666] uppercase font-mono">Stage 0{idx}</span>
                       {isCurrent && (
-                        <span className="text-[10px] font-bold text-[#818CF8] uppercase">Active</span>
+                        <span className="text-[10px] font-mono text-[#E0B83F] uppercase">Active</span>
                       )}
                       {isFuturePredicted && (
-                        <span className="text-[10px] font-semibold text-[#F59E0B] uppercase">Predicted</span>
+                        <span className="text-[10px] font-mono text-[#C9A227] uppercase">Predicted</span>
                       )}
                     </div>
-                    <div className={`font-semibold ${isCurrent ? 'text-[#F8FAFC]' : isPast ? 'text-[#71717A]' : 'text-[#F8FAFC]'}`}>
+                    <div className={`font-medium ${isCurrent ? 'text-[#F5F5F5]' : isPast ? 'text-[#666666]' : 'text-[#F5F5F5]'}`}>
                       {name}
                     </div>
                   </div>
@@ -438,32 +442,34 @@ export default function Prediction() {
             </div>
           </div>
 
-          {/* Explainability & Decision Support */}
+          {/* Analytical Explainability & Decision Support */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Explainability (Top contributing features) */}
-            <div className="card p-5">
-              <h2 className="text-sm font-semibold text-[#F8FAFC] uppercase tracking-wider mb-1">
-                Feature Attribution
-              </h2>
-              <p className="text-xs text-[#71717A] mb-4">
-                Telemetry indicators contributing to current risk score
-              </p>
+            {/* Analytical Explainability: Why This Forecast? */}
+            <div className="glass-panel p-5 space-y-4">
+              <div>
+                <h2 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
+                  Why This Forecast?
+                </h2>
+                <p className="text-[11px] text-[#666666] mt-0.5">
+                  High-contribution telemetry indicators driving latent trajectory output
+                </p>
+              </div>
 
-              <div className="space-y-3">
+              <div className="space-y-3 pt-1">
                 {prediction.contributing_features && prediction.contributing_features.length > 0 ? (
                   prediction.contributing_features.map((feat, idx) => {
                     const weightPct = Math.round(feat.contribution * 100);
-                    const levelLabel = weightPct >= 20 ? 'High contribution' : weightPct >= 10 ? 'Medium contribution' : 'Low contribution';
+                    const levelLabel = weightPct >= 20 ? 'High contribution' : weightPct >= 10 ? 'Moderate' : 'Low contribution';
 
                     return (
-                      <div key={idx} className="border-b border-[#242943] pb-2 last:border-0">
+                      <div key={idx} className="border-b border-[rgba(255,255,255,0.04)] pb-2.5 last:border-0">
                         <div className="flex justify-between text-xs mb-1">
-                          <span className="font-medium text-[#F8FAFC]">{feat.feature}</span>
-                          <span className="text-[#A1A1AA]">{levelLabel}</span>
+                          <span className="font-mono text-[#F5F5F5]">{feat.feature}</span>
+                          <span className="text-[11px] font-mono text-[#A1A1A1]">{levelLabel} ({weightPct}%)</span>
                         </div>
-                        <div className="w-full bg-[#242943] rounded-full h-1.5">
+                        <div className="w-full bg-[rgba(255,255,255,0.06)] rounded-full h-1">
                           <div
-                            className="h-1.5 rounded-full bg-[#6366F1]"
+                            className="h-1 rounded-full bg-[#C9A227]"
                             style={{ width: `${Math.min(feat.contribution * 100, 100)}%` }}
                           />
                         </div>
@@ -471,27 +477,29 @@ export default function Prediction() {
                     );
                   })
                 ) : (
-                  <p className="text-xs text-[#71717A]">All features within nominal baseline bounds.</p>
+                  <p className="text-xs text-[#666666] font-mono">Telemetry within nominal operational bounds.</p>
                 )}
               </div>
             </div>
 
             {/* Decision Support Playbook */}
-            <div className="card p-5">
-              <h2 className="text-sm font-semibold text-[#F8FAFC] uppercase tracking-wider mb-1">
-                Decision Support
-              </h2>
-              <p className="text-xs text-[#71717A] mb-4">
-                Recommended responses for {prediction.current_stage_label || prediction.stage_label}
-              </p>
+            <div className="glass-panel p-5 space-y-4">
+              <div>
+                <h2 className="text-xs font-mono tracking-wider text-[#A1A1A1] uppercase">
+                  Actionable Defence Playbook
+                </h2>
+                <p className="text-[11px] text-[#666666] mt-0.5">
+                  Pre-emptive containment protocols for {prediction.current_stage_label || prediction.stage_label}
+                </p>
+              </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5 pt-1">
                 {getMitigationPlan(prediction.current_stage).map((item, idx) => (
-                  <div key={idx} className="p-3 bg-[#14182A] border border-[#242943] rounded text-xs">
-                    <div className="font-semibold text-[#F8FAFC] mb-0.5">
-                      {idx + 1}. {item.action}
+                  <div key={idx} className="p-3 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-sm text-xs">
+                    <div className="font-medium text-[#F5F5F5] mb-0.5 font-mono">
+                      0{idx + 1}. {item.action}
                     </div>
-                    <div className="text-[#A1A1AA]">
+                    <div className="text-[#A1A1A1] text-[11px]">
                       {item.detail}
                     </div>
                   </div>
