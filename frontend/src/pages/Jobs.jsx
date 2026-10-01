@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { listJobs } from '../api/client';
-import { CloudArrowUpIcon, TableCellsIcon, SparklesIcon, ScaleIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([]);
@@ -21,23 +21,21 @@ export default function Jobs() {
     };
 
     fetchJobs();
-    const interval = setInterval(fetchJobs, 3000);
+    const interval = setInterval(fetchJobs, 4000);
     return () => clearInterval(interval);
   }, []);
 
   const getStatusBadge = (status) => {
-    const styles = {
-      PENDING: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
-      PROCESSING: 'bg-blue-500/20 text-blue-300 border-blue-500/30 animate-pulse',
-      DONE: 'bg-green-500/20 text-green-300 border-green-500/30',
-      FAILED: 'bg-red-500/20 text-red-300 border-red-500/30'
-    };
-    const style = styles[status] || 'bg-gray-500/20 text-gray-300 border-gray-500/30';
-    return (
-      <span className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-medium border ${style}`}>
-        {status}
-      </span>
-    );
+    switch (status) {
+      case 'DONE':
+        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Completed</span>;
+      case 'PROCESSING':
+        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">Processing</span>;
+      case 'FAILED':
+        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700 border border-rose-200">Failed</span>;
+      default:
+        return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">Pending</span>;
+    }
   };
 
   const formatSize = (bytes) => {
@@ -49,98 +47,105 @@ export default function Jobs() {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
+      {/* Title & Action */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 flex items-center gap-2">
-            <TableCellsIcon className="w-8 h-8 text-cyan-400" />
-            Ingested Telemetry Jobs
+          <h1 className="text-xl font-bold text-[#0F3D56]">
+            Jobs & Timelines
           </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Real-time pipeline monitoring & temporal feature sequence tracking.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Historical telemetry ingestion logs and state extraction jobs
           </p>
         </div>
-        <Link 
+
+        <Link
           to="/upload"
-          className="inline-flex items-center gap-2 px-4 py-2 border border-cyan-500/40 text-sm font-bold rounded-lg text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/25 transition-all shadow-[0_0_15px_rgba(0,245,255,0.2)]"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-[#0F3D56] text-white text-xs font-medium hover:bg-[#164967] transition-colors"
         >
-          <CloudArrowUpIcon className="w-4 h-4" />
-          Upload New File
+          <ArrowUpTrayIcon className="w-3.5 h-3.5 text-[#0EA5A8]" />
+          New Telemetry Upload
         </Link>
       </div>
 
-      <div className="card border border-cyan-500/25 overflow-hidden">
+      {/* Main Table Card */}
+      <div className="card overflow-hidden">
         {loading && jobs.length === 0 ? (
-          <div className="p-12 text-center text-gray-400">Loading telemetry jobs...</div>
+          <div className="p-8 text-center text-xs text-slate-500">Loading jobs...</div>
         ) : jobs.length === 0 ? (
-          <div className="p-12 text-center">
-            <h3 className="text-lg font-bold text-gray-200">No jobs found</h3>
-            <p className="mt-1 text-sm text-gray-400">Get started by uploading a PCAP or CSV telemetry file.</p>
-            <Link
-              to="/upload"
-              className="mt-4 inline-block px-4 py-2 rounded-lg bg-cyan-500 text-black font-bold text-xs"
-            >
-              Go to Upload
-            </Link>
+          <div className="p-12 text-center text-xs text-slate-500">
+            No telemetry jobs found. Upload a capture file to begin.
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-800 text-sm">
-              <thead className="bg-black/60">
-                <tr className="text-xs uppercase tracking-wider text-gray-400 text-left">
-                  <th scope="col" className="px-6 py-3.5">File & Resolution</th>
-                  <th scope="col" className="px-6 py-3.5">Status</th>
-                  <th scope="col" className="px-6 py-3.5">File Size</th>
-                  <th scope="col" className="px-6 py-3.5">Ingested At</th>
-                  <th scope="col" className="px-6 py-3.5 text-right">Analysis Actions</th>
+            <table className="min-w-full divide-y divide-slate-200 text-xs">
+              <thead className="bg-slate-50">
+                <tr className="text-left text-slate-600 font-medium">
+                  <th scope="col" className="py-3 px-4">Job</th>
+                  <th scope="col" className="py-3 px-4">File</th>
+                  <th scope="col" className="py-3 px-4">Created</th>
+                  <th scope="col" className="py-3 px-4">Status</th>
+                  <th scope="col" className="py-3 px-4">Flows</th>
+                  <th scope="col" className="py-3 px-4">Risk</th>
+                  <th scope="col" className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800/60 bg-transparent">
+              <tbody className="divide-y divide-slate-100">
                 {jobs.map((job) => (
                   <tr 
                     key={job.id} 
-                    className="hover:bg-cyan-950/20 transition-colors"
+                    className="hover:bg-slate-50/80 transition-colors"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold font-mono text-cyan-200">{job.filename}</div>
-                      <div className="text-xs text-gray-500">ID: {job.id.substring(0, 8)}... · Window: {job.window_seconds}s</div>
+                    <td className="py-3 px-4 font-mono text-slate-500">
+                      {job.id.substring(0, 8)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="py-3 px-4 font-medium text-[#0F3D56]">
+                      {job.filename}
+                      <span className="text-slate-400 font-normal ml-2">({formatSize(job.file_size)})</span>
+                    </td>
+                    <td className="py-3 px-4 text-slate-500">
+                      {new Date(job.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                    </td>
+                    <td className="py-3 px-4">
                       {getStatusBadge(job.status)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
-                      {formatSize(job.file_size)}
+                    <td className="py-3 px-4 text-slate-600 font-mono">
+                      {job.total_flows ? job.total_flows.toLocaleString() : '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                      {new Date(job.created_at).toLocaleString()}
+                    <td className="py-3 px-4">
+                      {job.status === 'DONE' ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs text-slate-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                          Monitored
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right space-x-2 text-xs">
+                    <td className="py-3 px-4 text-right space-x-2">
                       {job.status === 'DONE' ? (
                         <>
                           <Link
-                            to={`/jobs/${job.id}/predict`}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 font-semibold transition-colors"
+                            to={`/jobs/${job.id}/timeline`}
+                            className="inline-block px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
                           >
-                            <SparklesIcon className="w-3.5 h-3.5" />
+                            View
+                          </Link>
+                          <Link
+                            to={`/jobs/${job.id}/predict`}
+                            className="inline-block px-2.5 py-1 rounded bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] border border-[#99F6E4] font-medium transition-colors"
+                          >
                             Forecast
                           </Link>
                           <Link
-                            to={`/jobs/${job.id}/timeline`}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30 font-semibold transition-colors"
-                          >
-                            <ClockIcon className="w-3.5 h-3.5" />
-                            Timeline
-                          </Link>
-                          <Link
                             to={`/jobs/${job.id}/benchmark`}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-700/40 text-gray-300 border border-gray-600 hover:bg-gray-700/60 font-semibold transition-colors"
+                            className="inline-block px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition-colors"
                           >
-                            <ScaleIcon className="w-3.5 h-3.5" />
-                            Benchmark
+                            Details
                           </Link>
                         </>
                       ) : (
-                        <span className="text-gray-500 italic">Processing traffic...</span>
+                        <span className="text-slate-400">Processing...</span>
                       )}
                     </td>
                   </tr>

@@ -5,8 +5,9 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import {
-  ScaleIcon, CheckCircleIcon, ExclamationTriangleIcon,
-  ClockIcon, ShieldCheckIcon, BeakerIcon
+  ScaleIcon,
+  ExclamationTriangleIcon,
+  ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 
 export default function Benchmark() {
@@ -19,12 +20,11 @@ export default function Benchmark() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch available completed jobs
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         const jobsList = await listJobs();
-        const doneJobs = (jobsList || []).filter(j => j.status === 'DONE');
+        const doneJobs = (jobsList || []).filter((j) => j.status === 'DONE');
         setJobs(doneJobs);
         if (!selectedJobId && doneJobs.length > 0) {
           setSelectedJobId(doneJobs[0].id);
@@ -36,14 +36,12 @@ export default function Benchmark() {
     fetchJobs();
   }, []);
 
-  // Sync selected job ID from URL param
   useEffect(() => {
     if (routeJobId) {
       setSelectedJobId(routeJobId);
     }
   }, [routeJobId]);
 
-  // Run benchmark on selected job
   const executeBenchmark = async () => {
     if (!selectedJobId) {
       setLoading(false);
@@ -55,7 +53,7 @@ export default function Benchmark() {
       const data = await runBenchmark(selectedJobId);
       setBenchmarkData(data);
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'Failed to run benchmark.');
+      setError(err.response?.data?.detail || err.message || 'Failed to execute benchmark evaluation.');
     } finally {
       setLoading(false);
     }
@@ -71,310 +69,264 @@ export default function Benchmark() {
     navigate(`/jobs/${newId}/benchmark`);
   };
 
-  // Prepare chart comparison data
-  const comparisonChartData = benchmarkData ? [
-    {
-      metric: 'Precision',
-      'Static Baseline (LR)': Math.round((benchmarkData.models?.logistic_regression?.metrics?.precision || 0) * 100),
-      'Temporal World Model': Math.round((benchmarkData.models?.temporal_world_model?.metrics?.precision || 0) * 100),
-    },
-    {
-      metric: 'Recall',
-      'Static Baseline (LR)': Math.round((benchmarkData.models?.logistic_regression?.metrics?.recall || 0) * 100),
-      'Temporal World Model': Math.round((benchmarkData.models?.temporal_world_model?.metrics?.recall || 0) * 100),
-    },
-    {
-      metric: 'F1 Score',
-      'Static Baseline (LR)': Math.round((benchmarkData.models?.logistic_regression?.metrics?.f1 || 0) * 100),
-      'Temporal World Model': Math.round((benchmarkData.models?.temporal_world_model?.metrics?.f1 || 0) * 100),
-    },
-    {
-      metric: 'Accuracy',
-      'Static Baseline (LR)': Math.round((benchmarkData.models?.logistic_regression?.metrics?.accuracy || 0) * 100),
-      'Temporal World Model': Math.round((benchmarkData.models?.temporal_world_model?.metrics?.accuracy || 0) * 100),
-    },
-  ] : [];
-
   const lrMetrics = benchmarkData?.models?.logistic_regression?.metrics || {};
   const wmMetrics = benchmarkData?.models?.temporal_world_model?.metrics || {};
   const datasetInfo = benchmarkData?.dataset || {};
 
+  const comparisonChartData = benchmarkData ? [
+    {
+      metric: 'Precision',
+      'Logistic Regression': Math.round((lrMetrics.precision || 0) * 100),
+      'Temporal World Model': Math.round((wmMetrics.precision || 0) * 100),
+    },
+    {
+      metric: 'Recall',
+      'Logistic Regression': Math.round((lrMetrics.recall || 0) * 100),
+      'Temporal World Model': Math.round((wmMetrics.recall || 0) * 100),
+    },
+    {
+      metric: 'F1 Score',
+      'Logistic Regression': Math.round((lrMetrics.f1 || 0) * 100),
+      'Temporal World Model': Math.round((wmMetrics.f1 || 0) * 100),
+    },
+    {
+      metric: 'Accuracy',
+      'Logistic Regression': Math.round((lrMetrics.accuracy || 0) * 100),
+      'Temporal World Model': Math.round((wmMetrics.accuracy || 0) * 100),
+    },
+  ] : [];
+
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Header Banner */}
-      <div className="card p-6 border border-purple-500/30 flex flex-wrap justify-between items-center gap-4">
+    <div className="space-y-6">
+      {/* Header Bar */}
+      <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <ScaleIcon className="w-8 h-8 text-purple-400" />
-            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-cyan-400">
-              Model Benchmark & Evaluation
-            </h1>
-          </div>
-          <p className="text-sm text-purple-200/70 mt-1">
-            Head-to-Head Comparison: Static Classifier Baseline vs. Temporal World Model
+          <h1 className="text-xl font-bold text-[#0F3D56]">
+            Model Benchmark
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Static baseline classification vs. sequential temporal world model
           </p>
         </div>
 
-        {/* Job Selector */}
-        <div className="flex items-center gap-3">
-          <label className="text-xs uppercase tracking-wider text-purple-300 font-semibold">
-            Dataset Job:
-          </label>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="text-xs text-slate-500 font-medium">Session:</label>
           <select
             value={selectedJobId}
             onChange={handleJobChange}
-            className="bg-black/60 border border-purple-500/50 rounded-lg px-3 py-2 text-sm text-purple-100 focus:outline-none focus:border-purple-400"
+            className="bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#0EA5A8]"
           >
-            {jobs.length === 0 && <option value="">No completed jobs available</option>}
-            {jobs.map(j => (
+            {jobs.length === 0 && <option value="">No completed jobs</option>}
+            {jobs.map((j) => (
               <option key={j.id} value={j.id}>
-                {j.filename} ({j.window_seconds}s win) — {j.id.substring(0, 8)}...
+                {j.filename} ({j.window_seconds}s window)
               </option>
             ))}
           </select>
           {selectedJobId && (
             <Link
               to={`/jobs/${selectedJobId}/predict`}
-              className="px-3 py-2 text-xs border border-cyan-400/40 rounded-lg text-cyan-300 hover:bg-cyan-500/20 transition-colors"
+              className="px-3 py-1.5 text-xs border border-slate-300 rounded text-slate-700 hover:bg-slate-50 font-medium transition-colors"
             >
-              Forecast View →
+              Forecast View
             </Link>
           )}
         </div>
       </div>
 
       {loading && (
-        <div className="card p-12 text-center border border-purple-500/30">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-          <p className="text-purple-200 text-lg">Evaluating Models on Temporal Test Partition...</p>
-          <p className="text-xs text-gray-400 mt-1">Training baseline & computing out-of-sample confusion matrices</p>
+        <div className="card p-12 text-center text-xs text-slate-500">
+          Running out-of-sample benchmark evaluation...
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-900/40 border border-red-500 rounded-xl text-red-200 flex items-center gap-3">
-          <ExclamationTriangleIcon className="w-6 h-6 flex-shrink-0 text-red-400" />
-          <div>
-            <p className="font-semibold">Benchmark Error</p>
-            <p className="text-sm">{error}</p>
-          </div>
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded text-rose-700 text-xs flex items-center gap-2">
+          <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {benchmarkData && !loading && (
         <>
-          {/* Methodology Card */}
-          <div className="card p-5 border border-purple-500/20 flex flex-wrap justify-between items-center gap-4 text-xs text-gray-300">
-            <div className="flex items-center gap-3">
-              <ClockIcon className="w-5 h-5 text-purple-400" />
-              <div>
-                <span className="font-bold text-gray-100">Strict Temporal Partition:</span> First 70% of chronological windows used for training, final 30% reserved for testing. Zero future data leakage.
-              </div>
+          {/* Methodology Banner */}
+          <div className="card p-4 bg-slate-50 border-slate-200 text-xs text-slate-600 flex flex-wrap justify-between items-center gap-3">
+            <div>
+              <span className="font-semibold text-[#0F3D56]">Evaluation Methodology:</span> Chronological 70% train split and 30% out-of-sample test partition (zero future-state data leakage).
             </div>
-            <div className="flex gap-4">
-              <div>Total States: <span className="font-mono text-cyan-300 font-bold">{datasetInfo.total_states || 0}</span></div>
-              <div>Train Windows: <span className="font-mono text-purple-300 font-bold">{datasetInfo.train_samples || 0}</span></div>
-              <div>Test Windows: <span className="font-mono text-pink-300 font-bold">{datasetInfo.test_samples || 0}</span></div>
+            <div className="flex gap-4 font-mono text-[11px]">
+              <span>Total States: <strong className="text-slate-800">{datasetInfo.total_states || 0}</strong></span>
+              <span>Train Windows: <strong className="text-slate-800">{datasetInfo.train_samples || 0}</strong></span>
+              <span>Test Windows: <strong className="text-slate-800">{datasetInfo.test_samples || 0}</strong></span>
             </div>
           </div>
 
-          {/* Metric Comparison Cards */}
+          {/* Side-by-Side Model Comparison Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Baseline Model Card */}
-            <div className="card p-6 border border-gray-700/60 bg-black/40">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <span className="text-[11px] uppercase tracking-wider font-bold text-gray-400 px-2 py-0.5 rounded bg-gray-800">
-                    Baseline
-                  </span>
-                  <h3 className="text-xl font-bold text-gray-200 mt-1">
-                    Static Logistic Regression
-                  </h3>
-                  <p className="text-xs text-gray-400">
-                    Per-window feature vector classification without temporal state memory.
-                  </p>
-                </div>
+            {/* Baseline Card */}
+            <div className="card p-5">
+              <div className="border-b border-slate-100 pb-3 mb-4">
+                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Baseline Model</span>
+                <h3 className="text-base font-bold text-[#0F3D56] mt-0.5">
+                  Static Logistic Regression
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Per-window classification without historical state memory
+                </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mt-6">
-                <div className="bg-black/40 p-3 rounded-lg border border-gray-800">
-                  <div className="text-xs text-gray-400">F1 Score</div>
-                  <div className="text-2xl font-bold text-gray-300">
-                    {Math.round((lrMetrics.f1 || 0) * 100)}%
-                  </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-slate-50 p-3 rounded border border-slate-100">
+                  <div className="text-[11px] text-slate-500">F1 Score</div>
+                  <div className="text-xl font-bold text-[#0F3D56] mt-1">{Math.round((lrMetrics.f1 || 0) * 100)}%</div>
                 </div>
-                <div className="bg-black/40 p-3 rounded-lg border border-gray-800">
-                  <div className="text-xs text-gray-400">Precision</div>
-                  <div className="text-2xl font-bold text-gray-300">
-                    {Math.round((lrMetrics.precision || 0) * 100)}%
-                  </div>
+                <div className="bg-slate-50 p-3 rounded border border-slate-100">
+                  <div className="text-[11px] text-slate-500">Accuracy</div>
+                  <div className="text-xl font-bold text-[#0F3D56] mt-1">{Math.round((lrMetrics.accuracy || 0) * 100)}%</div>
                 </div>
-                <div className="bg-black/40 p-3 rounded-lg border border-gray-800">
-                  <div className="text-xs text-gray-400">Recall</div>
-                  <div className="text-2xl font-bold text-gray-300">
-                    {Math.round((lrMetrics.recall || 0) * 100)}%
-                  </div>
+                <div className="bg-slate-50 p-3 rounded border border-slate-100">
+                  <div className="text-[11px] text-slate-500">Precision</div>
+                  <div className="text-xl font-bold text-[#0F3D56] mt-1">{Math.round((lrMetrics.precision || 0) * 100)}%</div>
                 </div>
-                <div className="bg-black/40 p-3 rounded-lg border border-gray-800">
-                  <div className="text-xs text-gray-400">False Positive Rate</div>
-                  <div className="text-2xl font-bold text-red-400">
-                    {Math.round((lrMetrics.fpr || 0) * 100)}%
-                  </div>
+                <div className="bg-slate-50 p-3 rounded border border-slate-100">
+                  <div className="text-[11px] text-slate-500">False Positive Rate</div>
+                  <div className="text-xl font-bold text-slate-700 mt-1">{Math.round((lrMetrics.fpr || 0) * 100)}%</div>
                 </div>
               </div>
 
               {/* Confusion Matrix */}
-              <div className="mt-6 pt-4 border-t border-gray-800">
-                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                  Test Set Confusion Matrix
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className="p-2 bg-green-950/20 border border-green-800/40 rounded">
-                    <div className="text-gray-400 text-[10px]">True Positives (TP)</div>
-                    <div className="font-mono font-bold text-green-400 text-base">{lrMetrics.tp ?? 0}</div>
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Confusion Matrix</div>
+                <div className="grid grid-cols-2 gap-1.5 text-center text-xs font-mono">
+                  <div className="p-2 bg-slate-50 rounded">
+                    <div className="text-[10px] text-slate-400">TP</div>
+                    <div className="font-semibold text-slate-700">{lrMetrics.tp ?? 0}</div>
                   </div>
-                  <div className="p-2 bg-red-950/20 border border-red-800/40 rounded">
-                    <div className="text-gray-400 text-[10px]">False Positives (FP)</div>
-                    <div className="font-mono font-bold text-red-400 text-base">{lrMetrics.fp ?? 0}</div>
+                  <div className="p-2 bg-slate-50 rounded">
+                    <div className="text-[10px] text-slate-400">FP</div>
+                    <div className="font-semibold text-slate-700">{lrMetrics.fp ?? 0}</div>
                   </div>
-                  <div className="p-2 bg-yellow-950/20 border border-yellow-800/40 rounded">
-                    <div className="text-gray-400 text-[10px]">False Negatives (FN)</div>
-                    <div className="font-mono font-bold text-yellow-400 text-base">{lrMetrics.fn ?? 0}</div>
+                  <div className="p-2 bg-slate-50 rounded">
+                    <div className="text-[10px] text-slate-400">FN</div>
+                    <div className="font-semibold text-slate-700">{lrMetrics.fn ?? 0}</div>
                   </div>
-                  <div className="p-2 bg-blue-950/20 border border-blue-800/40 rounded">
-                    <div className="text-gray-400 text-[10px]">True Negatives (TN)</div>
-                    <div className="font-mono font-bold text-blue-400 text-base">{lrMetrics.tn ?? 0}</div>
+                  <div className="p-2 bg-slate-50 rounded">
+                    <div className="text-[10px] text-slate-400">TN</div>
+                    <div className="font-semibold text-slate-700">{lrMetrics.tn ?? 0}</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Proposed Temporal World Model Card */}
-            <div className="card p-6 border-2 border-cyan-400/80 bg-cyan-950/20 shadow-[0_0_30px_rgba(0,245,255,0.15)]">
-              <div className="flex justify-between items-start mb-4">
+            {/* Champion Model Card */}
+            <div className="card p-5 border-[#0EA5A8]">
+              <div className="border-b border-slate-100 pb-3 mb-4 flex justify-between items-start">
                 <div>
-                  <span className="text-[11px] uppercase tracking-wider font-bold text-cyan-300 px-2 py-0.5 rounded bg-cyan-900/60 border border-cyan-500/40">
-                    Proposed Champion
-                  </span>
-                  <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-pink-400 mt-1">
+                  <span className="text-[10px] font-semibold text-[#0EA5A8] uppercase tracking-wider">Champion Model</span>
+                  <h3 className="text-base font-bold text-[#0F3D56] mt-0.5">
                     Temporal World Model
                   </h3>
-                  <p className="text-xs text-cyan-200/70">
-                    Recurrent hidden state + multi-step trajectory projection + MITRE stages.
+                  <p className="text-xs text-slate-500">
+                    Recurrent latent state tracking with multi-step trajectory projection
                   </p>
                 </div>
-                <span className="px-2 py-1 rounded bg-green-500/20 text-green-400 text-xs font-bold border border-green-500/40">
-                  +{Math.max(0, Math.round(((wmMetrics.f1 || 0) - (lrMetrics.f1 || 0)) * 100))}% F1 Lift
-                </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mt-6">
-                <div className="bg-black/60 p-3 rounded-lg border border-cyan-500/30">
-                  <div className="text-xs text-cyan-300">F1 Score</div>
-                  <div className="text-2xl font-bold text-cyan-400">
-                    {Math.round((wmMetrics.f1 || 0) * 100)}%
-                  </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-[#F0FDFA] p-3 rounded border border-[#CCFBF1]">
+                  <div className="text-[11px] text-[#0F766E]">F1 Score</div>
+                  <div className="text-xl font-bold text-[#0F3D56] mt-1">{Math.round((wmMetrics.f1 || 0) * 100)}%</div>
                 </div>
-                <div className="bg-black/60 p-3 rounded-lg border border-cyan-500/30">
-                  <div className="text-xs text-cyan-300">Precision</div>
-                  <div className="text-2xl font-bold text-cyan-400">
-                    {Math.round((wmMetrics.precision || 0) * 100)}%
-                  </div>
+                <div className="bg-[#F0FDFA] p-3 rounded border border-[#CCFBF1]">
+                  <div className="text-[11px] text-[#0F766E]">Accuracy</div>
+                  <div className="text-xl font-bold text-[#0F3D56] mt-1">{Math.round((wmMetrics.accuracy || 0) * 100)}%</div>
                 </div>
-                <div className="bg-black/60 p-3 rounded-lg border border-cyan-500/30">
-                  <div className="text-xs text-cyan-300">Recall</div>
-                  <div className="text-2xl font-bold text-cyan-400">
-                    {Math.round((wmMetrics.recall || 0) * 100)}%
-                  </div>
+                <div className="bg-[#F0FDFA] p-3 rounded border border-[#CCFBF1]">
+                  <div className="text-[11px] text-[#0F766E]">Precision</div>
+                  <div className="text-xl font-bold text-[#0F3D56] mt-1">{Math.round((wmMetrics.precision || 0) * 100)}%</div>
                 </div>
-                <div className="bg-black/60 p-3 rounded-lg border border-cyan-500/30">
-                  <div className="text-xs text-cyan-300">False Positive Rate</div>
-                  <div className="text-2xl font-bold text-green-400">
-                    {Math.round((wmMetrics.fpr || 0) * 100)}%
-                  </div>
+                <div className="bg-[#F0FDFA] p-3 rounded border border-[#CCFBF1]">
+                  <div className="text-[11px] text-[#0F766E]">False Positive Rate</div>
+                  <div className="text-xl font-bold text-emerald-700 mt-1">{Math.round((wmMetrics.fpr || 0) * 100)}%</div>
                 </div>
               </div>
 
               {/* Confusion Matrix */}
-              <div className="mt-6 pt-4 border-t border-cyan-800/40">
-                <div className="text-xs font-semibold text-cyan-300 uppercase tracking-wider mb-2">
-                  Test Set Confusion Matrix
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className="p-2 bg-green-950/40 border border-green-500/60 rounded">
-                    <div className="text-gray-300 text-[10px]">True Positives (TP)</div>
-                    <div className="font-mono font-bold text-green-300 text-base">{wmMetrics.tp ?? 0}</div>
+              <div className="mt-4 pt-3 border-t border-slate-100">
+                <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Confusion Matrix</div>
+                <div className="grid grid-cols-2 gap-1.5 text-center text-xs font-mono">
+                  <div className="p-2 bg-emerald-50 text-emerald-800 rounded">
+                    <div className="text-[10px] text-emerald-600">TP</div>
+                    <div className="font-semibold">{wmMetrics.tp ?? 0}</div>
                   </div>
-                  <div className="p-2 bg-red-950/40 border border-red-500/60 rounded">
-                    <div className="text-gray-300 text-[10px]">False Positives (FP)</div>
-                    <div className="font-mono font-bold text-red-300 text-base">{wmMetrics.fp ?? 0}</div>
+                  <div className="p-2 bg-slate-50 text-slate-700 rounded">
+                    <div className="text-[10px] text-slate-400">FP</div>
+                    <div className="font-semibold">{wmMetrics.fp ?? 0}</div>
                   </div>
-                  <div className="p-2 bg-yellow-950/40 border border-yellow-500/60 rounded">
-                    <div className="text-gray-300 text-[10px]">False Negatives (FN)</div>
-                    <div className="font-mono font-bold text-yellow-300 text-base">{wmMetrics.fn ?? 0}</div>
+                  <div className="p-2 bg-slate-50 text-slate-700 rounded">
+                    <div className="text-[10px] text-slate-400">FN</div>
+                    <div className="font-semibold">{wmMetrics.fn ?? 0}</div>
                   </div>
-                  <div className="p-2 bg-blue-950/40 border border-blue-500/60 rounded">
-                    <div className="text-gray-300 text-[10px]">True Negatives (TN)</div>
-                    <div className="font-mono font-bold text-blue-300 text-base">{wmMetrics.tn ?? 0}</div>
+                  <div className="p-2 bg-emerald-50 text-emerald-800 rounded">
+                    <div className="text-[10px] text-emerald-600">TN</div>
+                    <div className="font-semibold">{wmMetrics.tn ?? 0}</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Bar Chart Head to Head */}
-          <div className="card p-6 border border-purple-500/30">
-            <h3 className="text-xl font-bold text-purple-100 mb-4 flex items-center gap-2">
-              <BeakerIcon className="w-5 h-5 text-purple-400" />
-              Side-by-Side Performance Comparison (%)
+          {/* Performance Comparison Chart */}
+          <div className="card p-5">
+            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-4">
+              Side-by-Side Metric Comparison (%)
             </h3>
-            <div className="h-72 w-full">
+            <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={comparisonChartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="metric" stroke="#94a3b8" />
-                  <YAxis domain={[0, 100]} stroke="#94a3b8" unit="%" />
+                <BarChart data={comparisonChartData} margin={{ top: 10, right: 20, left: -10, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis dataKey="metric" stroke="#64748B" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} stroke="#64748B" tick={{ fontSize: 11 }} unit="%" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'rgba(10, 15, 25, 0.95)',
-                      borderColor: 'rgba(168, 85, 247, 0.4)',
-                      borderRadius: '8px',
-                      color: '#e2e8f0'
+                      backgroundColor: '#FFFFFF',
+                      borderColor: '#E2E8F0',
+                      borderRadius: '6px',
+                      fontSize: '12px'
                     }}
                   />
-                  <Legend />
-                  <Bar dataKey="Static Baseline (LR)" fill="#64748b" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="Temporal World Model" fill="#00f5ff" radius={[4, 4, 0, 0]} />
+                  <Legend wrapperStyle={{ fontSize: '11px' }} />
+                  <Bar dataKey="Logistic Regression" fill="#94A3B8" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="Temporal World Model" fill="#0EA5A8" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Architectural Justification: Why World Models Win */}
-          <div className="card p-6 border border-purple-500/30">
-            <h3 className="text-xl font-bold text-purple-100 mb-4 flex items-center gap-2">
-              <ShieldCheckIcon className="w-5 h-5 text-purple-400" />
-              Key Architectural Advantages: Temporal World Model vs. Static Classifiers
+          {/* Architectural Notes */}
+          <div className="card p-5">
+            <h3 className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-3">
+              Performance Factors
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="bg-black/40 p-4 rounded-xl border border-gray-800">
-                <div className="text-cyan-400 font-bold mb-1">1. Early Lead Time</div>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  Static per-packet or single-window classifiers only alert when full-blown volumetric thresholds trigger. The Temporal World Model models multi-step progression, alerting during subtle Phase 1 reconnaissance 3–5 windows ahead.
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-600">
+              <div className="p-3 bg-slate-50 rounded border border-slate-100">
+                <div className="font-semibold text-[#0F3D56] mb-1">Sequence State Memory</div>
+                <p>
+                  Maintains a rolling context window across consecutive time intervals, allowing the detection of low-and-slow reconnaissance prior to volumetric escalation.
                 </p>
               </div>
 
-              <div className="bg-black/40 p-4 rounded-xl border border-gray-800">
-                <div className="text-purple-400 font-bold mb-1">2. Low False Alarm Rate</div>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  Legitimate software updates or bursty web browsing can resemble exfiltration in single windows. Recurrent state history tracks baseline continuity, filtering out isolated spikes and reducing False Positive Rates.
+              <div className="p-3 bg-slate-50 rounded border border-slate-100">
+                <div className="font-semibold text-[#0F3D56] mb-1">False Alarm Mitigation</div>
+                <p>
+                  Isolated throughput bursts (such as scheduled backups or software updates) are distinguished from malicious exfiltration by tracking state continuity over time.
                 </p>
               </div>
 
-              <div className="bg-black/40 p-4 rounded-xl border border-gray-800">
-                <div className="text-pink-400 font-bold mb-1">3. Predictive Actionability</div>
-                <p className="text-gray-400 text-xs leading-relaxed">
-                  Instead of generating a static binary label ("Malicious"), the World Model projects the next transition state along the MITRE ATT&CK taxonomy, enabling proactive quarantine before access escalates.
+              <div className="p-3 bg-slate-50 rounded border border-slate-100">
+                <div className="font-semibold text-[#0F3D56] mb-1">Multi-Horizon Projection</div>
+                <p>
+                  Projects anticipated risk values into future time windows with momentum damping, allowing defensive controls to be staged in advance.
                 </p>
               </div>
             </div>

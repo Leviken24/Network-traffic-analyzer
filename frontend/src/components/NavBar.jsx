@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShieldExclamationIcon, SparklesIcon, ScaleIcon, CloudArrowUpIcon, TableCellsIcon, HomeIcon } from '@heroicons/react/24/outline';
 
 export default function NavBar() {
   const location = useLocation();
@@ -12,78 +11,77 @@ export default function NavBar() {
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/', icon: HomeIcon },
-    { label: 'Upload Telemetry', path: '/upload', icon: CloudArrowUpIcon },
-    { label: 'Jobs & Timelines', path: '/jobs', icon: TableCellsIcon },
-    { label: 'Attack Forecasting', path: '/predict', icon: SparklesIcon },
-    { label: 'Model Benchmark', path: '/benchmark', icon: ScaleIcon },
+    { label: 'Dashboard', path: '/' },
+    { label: 'Telemetry', path: '/upload' },
+    { label: 'Jobs & Timelines', path: '/jobs' },
+    { label: 'Attack Forecasting', path: '/predict' },
+    { label: 'Model Benchmark', path: '/benchmark' },
   ];
 
   return (
-    <nav className="glass sticky top-0 z-50 border-b border-cyan-500/20 backdrop-blur-xl bg-black/60 shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
+    <header className="bg-white border-b border-[#E2E8F0] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Brand Logo */}
-          <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-600 flex items-center justify-center text-black font-black text-xl shadow-[0_0_15px_rgba(0,245,255,0.4)] group-hover:scale-105 transition-transform">
-                ⚡
+        <div className="flex justify-between h-14 items-center">
+          {/* Brand Logo & Name */}
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded bg-[#0F3D56] flex items-center justify-center text-white">
+                <svg className="w-4 h-4 text-[#0EA5A8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="6" cy="6" r="3" />
+                  <circle cx="18" cy="6" r="3" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="18" cy="18" r="3" />
+                  <line x1="9" y1="6" x2="15" y2="6" />
+                  <line x1="9" y1="18" x2="15" y2="18" />
+                  <line x1="6" y1="9" x2="6" y2="15" />
+                  <line x1="18" y1="9" x2="18" y2="15" />
+                </svg>
               </div>
-              <div>
-                <span className="text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-pink-400">
-                  SIH NetFlow
-                </span>
-                <span className="block text-[9px] uppercase tracking-widest font-mono text-cyan-400/80 -mt-1">
-                  World Model Cyber Defence
-                </span>
-              </div>
+              <span className="font-bold text-base tracking-wide text-[#0F3D56]">
+                NETFLOW
+              </span>
             </Link>
 
-            {/* Nav Links */}
-            <div className="hidden md:flex items-center space-x-1">
+            {/* Main Navigation */}
+            <nav className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => {
                 const active = isActive(item.path);
-                const Icon = item.icon;
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                       active
-                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_12px_rgba(0,245,255,0.25)]'
-                        : 'text-gray-400 hover:text-cyan-200 hover:bg-white/5 border border-transparent'
+                        ? 'bg-[#F0F6F9] text-[#0F3D56] font-semibold'
+                        : 'text-slate-600 hover:text-[#0F3D56] hover:bg-slate-50'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
                     {item.label}
                   </Link>
                 );
               })}
-            </div>
+            </nav>
           </div>
 
-          {/* Right Status Pill */}
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-xs font-mono text-cyan-300">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span>K-Step World Model v2.0</span>
-            </div>
+          {/* Right Header Area */}
+          <div className="flex items-center gap-3 text-xs text-slate-500">
+            <span className="text-xs text-slate-400 font-mono">SOC Engine</span>
           </div>
         </div>
       </div>
 
-      {/* Mobile Nav Row */}
-      <div className="md:hidden flex overflow-x-auto px-4 py-2 border-t border-gray-800/80 gap-2 bg-black/80">
+      {/* Mobile Navigation Bar */}
+      <div className="md:hidden flex overflow-x-auto px-4 py-2 border-t border-slate-200 gap-1 bg-slate-50">
         {navItems.map((item) => {
           const active = isActive(item.path);
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`whitespace-nowrap px-3 py-1 rounded text-xs font-semibold ${
+              className={`whitespace-nowrap px-2.5 py-1 rounded text-xs font-medium ${
                 active
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                  : 'text-gray-400'
+                  ? 'bg-white text-[#0F3D56] font-semibold border border-slate-200 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {item.label}
@@ -91,6 +89,6 @@ export default function NavBar() {
           );
         })}
       </div>
-    </nav>
+    </header>
   );
 }

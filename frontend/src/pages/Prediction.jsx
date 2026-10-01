@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPrediction, listJobs, getStages } from '../api/client';
 import {
-  AreaChart, Area, LineChart, Line, BarChart, Bar,
+  AreaChart, Area, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import {
-  ShieldExclamationIcon, ShieldCheckIcon, ArrowTrendingUpIcon,
-  AdjustmentsHorizontalIcon, SparklesIcon, ExclamationTriangleIcon,
-  CheckCircleIcon, ArrowPathIcon
+  ShieldCheckIcon,
+  ExclamationTriangleIcon,
+  ArrowTrendingUpIcon,
+  AdjustmentsHorizontalIcon,
+  InformationCircleIcon
 } from '@heroicons/react/24/outline';
 
 export default function Prediction() {
@@ -41,14 +43,12 @@ export default function Prediction() {
     fetchJobs();
   }, []);
 
-  // Sync selected job ID from URL param
   useEffect(() => {
     if (routeJobId) {
       setSelectedJobId(routeJobId);
     }
   }, [routeJobId]);
 
-  // Fetch stages definition
   useEffect(() => {
     const fetchStageDefs = async () => {
       try {
@@ -61,7 +61,6 @@ export default function Prediction() {
     fetchStageDefs();
   }, []);
 
-  // Fetch prediction data
   const loadPrediction = async () => {
     if (!selectedJobId) {
       setLoading(false);
@@ -89,15 +88,11 @@ export default function Prediction() {
     navigate(`/jobs/${newId}/predict`);
   };
 
-  const getStageColor = (stageIdx) => {
-    const colors = [
-      '#10b981', // Normal (Green)
-      '#f59e0b', // Recon (Yellow)
-      '#f97316', // Initial Access (Orange)
-      '#ef4444', // Lateral Movement (Red)
-      '#a855f7'  // C2/Exfil (Purple)
-    ];
-    return colors[stageIdx] || '#06b6d4';
+  // Severity color calculation
+  const getRiskLevel = (risk) => {
+    if (risk >= 0.7) return { label: 'Critical', colorText: 'text-rose-700', colorBg: 'bg-rose-50', colorBorder: 'border-rose-200' };
+    if (risk >= 0.3) return { label: 'Elevated', colorText: 'text-amber-700', colorBg: 'bg-amber-50', colorBorder: 'border-amber-200' };
+    return { label: 'Normal', colorText: 'text-emerald-700', colorBg: 'bg-emerald-50', colorBorder: 'border-emerald-200' };
   };
 
   const getMitigationPlan = (stageIdx) => {
@@ -111,7 +106,7 @@ export default function Prediction() {
       case 2:
         return [
           { action: "Mitigate SYN Flood", detail: "Enable SYN Cookies (syncookies=1) and TCP half-open connection pruning." },
-          { action: "Inspect Auth Endpoints", detail: "Monitor SSH / RDP / Web auth endpoints for credential brute forcing." },
+          { action: "Inspect Authentication Endpoints", detail: "Monitor SSH / RDP / Web authentication endpoints for credential brute forcing." },
           { action: "Isolate Attacker Ingress", detail: "Temporarily blackhole attacker IPs on border router ACLs." }
         ];
       case 3:
@@ -123,13 +118,13 @@ export default function Prediction() {
       case 4:
         return [
           { action: "Sever C2 Channels", detail: "Terminate outbound connections to unapproved high ports (4444, 8888, 31337)." },
-          { action: "Deep Packet Inspection on Egress", detail: "Inspect asymmetric large outbound data streams for exfiltration patterns." },
-          { action: "Trigger Incident Response", detail: "Initiate Tier 3 incident triage and preserve memory forensics." }
+          { action: "Inspect Egress Volume", detail: "Inspect asymmetric large outbound data streams for exfiltration patterns." },
+          { action: "Trigger Incident Response", detail: "Initiate security triage and preserve network flow logs for forensic analysis." }
         ];
       default:
         return [
           { action: "Baseline Monitoring", detail: "Traffic metrics within normal baseline operational limits. Continuous telemetry active." },
-          { action: "Automated Policy Verification", detail: "Firewall rule verification and continuous state snapshot ingestion." }
+          { action: "Policy Verification", detail: "Firewall rule verification and continuous state snapshot ingestion." }
         ];
     }
   };
@@ -143,13 +138,12 @@ export default function Prediction() {
         observedRisk: Math.round(item.risk * 100),
         forecastRisk: null,
         stage: item.stage_label,
-        type: 'historical'
+        type: 'observed'
       });
     });
   }
 
   if (prediction?.forecast && chartData.length > 0) {
-    // Add current risk as connection bridge
     const lastObserved = chartData[chartData.length - 1];
     if (lastObserved) {
       lastObserved.forecastRisk = lastObserved.observedRisk;
@@ -171,69 +165,63 @@ export default function Prediction() {
     "Reconnaissance",
     "Initial Access",
     "Lateral Movement",
-    "C2 / Exfiltration"
+    "Command & Control / Exfil"
   ];
 
+  const currentRiskInfo = prediction ? getRiskLevel(prediction.current_risk) : { label: 'Normal', colorText: 'text-slate-700', colorBg: 'bg-slate-50', colorBorder: 'border-slate-200' };
+
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Top Banner & Control Strip */}
-      <div className="card p-6 border border-cyan-500/30 flex flex-wrap justify-between items-center gap-4">
+    <div className="space-y-6">
+      {/* Header & Controls Bar */}
+      <div className="bg-white border border-[#E2E8F0] rounded-lg p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <SparklesIcon className="w-8 h-8 text-cyan-400 animate-pulse" />
-            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400">
-              AI Network Attack Forecasting
-            </h1>
-          </div>
-          <p className="text-sm text-cyan-100/70 mt-1">
-            Temporal World Model · Recurrent K-Step Risk Projection · MITRE ATT&CK Mapping
+          <h1 className="text-xl font-bold text-[#0F3D56]">
+            Attack Forecasting
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Temporal risk trajectory and attack stage projection
           </p>
         </div>
 
-        {/* Job Selector */}
-        <div className="flex items-center gap-3">
-          <label className="text-xs uppercase tracking-wider text-cyan-300 font-semibold">
-            Active Job:
-          </label>
+        <div className="flex flex-wrap items-center gap-3">
+          <label className="text-xs text-slate-500 font-medium">Session:</label>
           <select
             value={selectedJobId}
             onChange={handleJobChange}
-            className="bg-black/60 border border-cyan-500/50 rounded-lg px-3 py-2 text-sm text-cyan-100 focus:outline-none focus:border-cyan-400"
+            className="bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#0EA5A8]"
           >
-            {jobs.length === 0 && <option value="">No completed jobs available</option>}
-            {jobs.map(j => (
+            {jobs.length === 0 && <option value="">No completed jobs</option>}
+            {jobs.map((j) => (
               <option key={j.id} value={j.id}>
-                {j.filename} ({j.window_seconds}s win) — {j.id.substring(0, 8)}...
+                {j.filename} ({j.window_seconds}s window)
               </option>
             ))}
           </select>
           {selectedJobId && (
             <Link
               to={`/jobs/${selectedJobId}/timeline`}
-              className="px-3 py-2 text-xs border border-cyan-400/40 rounded-lg text-cyan-300 hover:bg-cyan-500/20 transition-colors"
+              className="px-3 py-1.5 text-xs border border-slate-300 rounded text-slate-700 hover:bg-slate-50 font-medium transition-colors"
             >
-              Timeline →
+              Timeline
             </Link>
           )}
           {selectedJobId && (
             <Link
               to={`/jobs/${selectedJobId}/benchmark`}
-              className="px-3 py-2 text-xs border border-purple-400/40 rounded-lg text-purple-300 hover:bg-purple-500/20 transition-colors"
+              className="px-3 py-1.5 text-xs border border-slate-300 rounded text-slate-700 hover:bg-slate-50 font-medium transition-colors"
             >
-              Benchmark ⚔️
+              Benchmark
             </Link>
           )}
         </div>
       </div>
 
-      {/* Control Sliders */}
+      {/* Sliders for Context & Forecast Horizon */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4 border border-cyan-500/20 flex flex-col justify-between">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-cyan-200">
-              Sequence Context Window: <span className="font-bold text-cyan-400">{sequenceLength} states</span>
-            </span>
-            <span className="text-xs text-gray-400">Historical states fed into World Model</span>
+        <div className="card p-4">
+          <div className="flex justify-between items-center mb-1 text-xs">
+            <span className="font-medium text-slate-700">Context Window</span>
+            <span className="font-semibold text-[#0F3D56]">{sequenceLength} states</span>
           </div>
           <input
             type="range"
@@ -242,16 +230,15 @@ export default function Prediction() {
             step="1"
             value={sequenceLength}
             onChange={(e) => setSequenceLength(Number(e.target.value))}
-            className="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0F3D56]"
           />
+          <div className="text-[11px] text-slate-400 mt-1">Number of historical windows evaluated</div>
         </div>
 
-        <div className="card p-4 border border-purple-500/20 flex flex-col justify-between">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-purple-200">
-              Forecast Horizon (K-Steps): <span className="font-bold text-purple-400">+{forecastSteps} windows</span>
-            </span>
-            <span className="text-xs text-gray-400">Future temporal states projected</span>
+        <div className="card p-4">
+          <div className="flex justify-between items-center mb-1 text-xs">
+            <span className="font-medium text-slate-700">Forecast Horizon</span>
+            <span className="font-semibold text-[#0EA5A8]">+{forecastSteps} windows</span>
           </div>
           <input
             type="range"
@@ -260,241 +247,194 @@ export default function Prediction() {
             step="1"
             value={forecastSteps}
             onChange={(e) => setForecastSteps(Number(e.target.value))}
-            className="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
+            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0EA5A8]"
           />
+          <div className="text-[11px] text-slate-400 mt-1">Future window states projected into horizon</div>
         </div>
       </div>
 
       {loading && (
-        <div className="card p-12 text-center border border-cyan-500/30">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
-          <p className="text-cyan-200 text-lg">Running Temporal World Model Inference...</p>
-          <p className="text-xs text-gray-400 mt-1">Projecting latent risk states across +{forecastSteps} future windows</p>
+        <div className="card p-12 text-center text-slate-500 text-xs">
+          Computing temporal risk projection...
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-900/40 border border-red-500 rounded-xl text-red-200 flex items-center gap-3">
-          <ExclamationTriangleIcon className="w-6 h-6 flex-shrink-0 text-red-400" />
-          <div>
-            <p className="font-semibold">Inference Error</p>
-            <p className="text-sm">{error}</p>
-          </div>
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded text-rose-700 text-xs flex items-center gap-2">
+          <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {prediction && !loading && (
         <>
-          {/* Executive Risk Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Risk Gauge */}
-            <div className="card p-5 border border-cyan-500/30 flex flex-col justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                Current Risk Score
+          {/* Executive Overview Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Current Risk */}
+            <div className="card p-5">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Current Risk
               </div>
-              <div className="my-3 flex items-baseline gap-2">
-                <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-red-400">
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-2xl font-bold text-[#0F3D56]">
                   {Math.round(prediction.current_risk * 100)}%
                 </span>
-                <span className="text-xs text-gray-400">({prediction.current_risk.toFixed(2)})</span>
+                <span className={`px-2 py-0.5 rounded text-xs font-medium border ${currentRiskInfo.colorBg} ${currentRiskInfo.colorText} ${currentRiskInfo.colorBorder}`}>
+                  {currentRiskInfo.label}
+                </span>
               </div>
-              <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3">
                 <div
-                  className="h-2 rounded-full transition-all duration-700"
-                  style={{
-                    width: `${prediction.current_risk * 100}%`,
-                    backgroundColor: getStageColor(prediction.current_stage)
-                  }}
+                  className={`h-1.5 rounded-full ${
+                    prediction.current_risk >= 0.7 ? 'bg-rose-600' :
+                    prediction.current_risk >= 0.3 ? 'bg-amber-500' : 'bg-emerald-600'
+                  }`}
+                  style={{ width: `${Math.min(prediction.current_risk * 100, 100)}%` }}
                 />
               </div>
             </div>
 
-            {/* MITRE ATT&CK Stage */}
-            <div className="card p-5 border border-cyan-500/30 flex flex-col justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                Predicted Attack Stage
+            {/* Predicted Stage */}
+            <div className="card p-5">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Predicted Stage
               </div>
-              <div className="my-3">
-                <span
-                  className="inline-block px-3 py-1 rounded-full text-sm font-bold border"
-                  style={{
-                    color: getStageColor(prediction.current_stage),
-                    borderColor: `${getStageColor(prediction.current_stage)}66`,
-                    backgroundColor: `${getStageColor(prediction.current_stage)}18`
-                  }}
-                >
-                  Stage {prediction.current_stage}: {prediction.current_stage_label || prediction.stage_label}
-                </span>
+              <div className="text-base font-bold text-[#0F3D56] mt-2">
+                {prediction.current_stage_label || prediction.stage_label}
               </div>
-              <div className="text-xs text-gray-400">
-                Confidence: <span className="text-cyan-300 font-semibold">{Math.round(prediction.stage_confidence * 100)}%</span>
+              <div className="text-xs text-slate-500 mt-1">
+                Phase {prediction.current_stage} of 4
               </div>
             </div>
 
-            {/* Attack Trajectory Trend */}
-            <div className="card p-5 border border-cyan-500/30 flex flex-col justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                Trajectory Trend
+            {/* Confidence */}
+            <div className="card p-5">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Model Confidence
               </div>
-              <div className="my-3 flex items-center gap-2">
-                {prediction.forecast && prediction.forecast.length > 0 && (
-                  prediction.forecast[prediction.forecast.length - 1].risk > prediction.current_risk ? (
-                    <>
-                      <ArrowTrendingUpIcon className="w-7 h-7 text-red-400" />
-                      <span className="text-lg font-bold text-red-400">Escalating</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircleIcon className="w-7 h-7 text-green-400" />
-                      <span className="text-lg font-bold text-green-400">Stable / Subsiding</span>
-                    </>
-                  )
-                )}
+              <div className="text-2xl font-bold text-[#0F3D56] mt-2">
+                {Math.round(prediction.stage_confidence * 100)}%
               </div>
-              <div className="text-xs text-gray-400">
-                Projected +{forecastSteps * (prediction.window_seconds || 60)}s horizon
+              <div className="text-xs text-slate-500 mt-1">
+                Based on sequence trajectory
               </div>
             </div>
 
-            {/* Processed Windows */}
-            <div className="card p-5 border border-cyan-500/30 flex flex-col justify-between">
-              <div className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                Sequence Telemetry
+            {/* Forecast Steps Breakdown */}
+            <div className="card p-5">
+              <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                Forecast Summary
               </div>
-              <div className="my-3">
-                <span className="text-3xl font-bold text-cyan-200">
-                  {prediction.context_states || prediction.sequence_length_used}
-                </span>
-                <span className="text-xs text-gray-400 ml-2">/ {prediction.total_states} total windows</span>
-              </div>
-              <div className="text-xs text-gray-400">
-                Resolution: {prediction.window_seconds}s per window
+              <div className="mt-2 space-y-1">
+                {prediction.forecast && prediction.forecast.slice(0, 3).map((f) => (
+                  <div key={f.step} className="flex justify-between text-xs">
+                    <span className="text-slate-500">{f.label} ({f.stage_label})</span>
+                    <span className="font-medium text-[#0F3D56]">{Math.round(f.risk * 100)}%</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
 
-          {/* Interactive Trajectory Forecast Chart */}
-          <div className="card p-6 border border-cyan-500/30">
-            <div className="flex justify-between items-center mb-4">
+          {/* Timeline Chart */}
+          <div className="card p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
               <div>
-                <h3 className="text-xl font-bold text-cyan-100 flex items-center gap-2">
-                  <AdjustmentsHorizontalIcon className="w-5 h-5 text-cyan-400" />
-                  K-Step Attack Risk Trajectory & Forecast
-                </h3>
-                <p className="text-xs text-gray-400">
-                  Solid cyan: observed state sequence · Dotted magenta: predicted future states [t+1 … t+{forecastSteps}]
+                <h2 className="text-sm font-semibold text-[#0F3D56] uppercase tracking-wider">
+                  Forecast Timeline
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Observed historical state sequence vs. predicted future trajectory
                 </p>
               </div>
               <div className="flex items-center gap-4 text-xs">
-                <span className="flex items-center gap-1.5 text-cyan-400">
-                  <span className="w-3 h-3 rounded-full bg-cyan-400 inline-block"></span> Observed History
+                <span className="flex items-center gap-1.5 text-slate-600">
+                  <span className="w-3 h-0.5 bg-[#0F3D56] inline-block"></span> Observed
                 </span>
-                <span className="flex items-center gap-1.5 text-purple-400">
-                  <span className="w-3 h-3 rounded-full bg-purple-400 inline-block"></span> Predicted Future
+                <span className="flex items-center gap-1.5 text-[#0EA5A8]">
+                  <span className="w-3 h-0.5 bg-[#0EA5A8] border-b border-dashed border-[#0EA5A8] inline-block"></span> Predicted
                 </span>
-                <span className="flex items-center gap-1.5 text-red-400">
-                  <span className="w-3 h-0.5 bg-red-400 inline-block"></span> Critical Alert Level (70%)
+                <span className="flex items-center gap-1.5 text-rose-600">
+                  <span className="w-3 h-0.5 bg-rose-500 border-b border-dashed border-rose-500 inline-block"></span> Critical (70%)
                 </span>
               </div>
             </div>
 
-            <div className="h-80 w-full">
+            <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="observedGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00f5ff" stopOpacity={0.35}/>
-                      <stop offset="95%" stopColor="#00f5ff" stopOpacity={0.0}/>
-                    </linearGradient>
-                    <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ff00d4" stopOpacity={0.35}/>
-                      <stop offset="95%" stopColor="#ff00d4" stopOpacity={0.0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="name" stroke="#94a3b8" />
-                  <YAxis domain={[0, 100]} stroke="#94a3b8" unit="%" />
+                <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                  <XAxis dataKey="name" stroke="#64748B" tick={{ fontSize: 11 }} />
+                  <YAxis domain={[0, 100]} stroke="#64748B" tick={{ fontSize: 11 }} unit="%" />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'rgba(10, 15, 25, 0.95)',
-                      borderColor: 'rgba(0, 245, 255, 0.4)',
-                      borderRadius: '8px',
-                      color: '#e2e8f0'
+                      backgroundColor: '#FFFFFF',
+                      borderColor: '#E2E8F0',
+                      borderRadius: '6px',
+                      color: '#172033',
+                      fontSize: '12px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
                     }}
                   />
-                  <ReferenceLine y={70} stroke="#ef4444" strokeDasharray="4 4" label={{ value: 'Critical Threshold', fill: '#ef4444', fontSize: 12 }} />
-                  <Area
+                  <ReferenceLine y={70} stroke="#DC2626" strokeDasharray="3 3" />
+                  <Line
                     type="monotone"
                     dataKey="observedRisk"
                     name="Observed Risk"
-                    stroke="#00f5ff"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#observedGrad)"
+                    stroke="#0F3D56"
+                    strokeWidth={2}
+                    dot={{ fill: '#0F3D56', r: 3 }}
+                    connectNulls={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="forecastRisk"
-                    name="Forecasted Risk"
-                    stroke="#ff00d4"
-                    strokeWidth={2.5}
-                    strokeDasharray="5 5"
-                    dot={{ fill: '#ff00d4', r: 4 }}
+                    name="Predicted Risk"
+                    stroke="#0EA5A8"
+                    strokeWidth={2}
+                    strokeDasharray="4 4"
+                    dot={{ fill: '#0EA5A8', r: 3 }}
                   />
-                </AreaChart>
+                </LineChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* MITRE ATT&CK Progression Pipeline */}
-          <div className="card p-6 border border-cyan-500/30">
-            <h3 className="text-xl font-bold text-cyan-100 mb-4 flex items-center gap-2">
-              <ShieldExclamationIcon className="w-5 h-5 text-cyan-400" />
-              MITRE ATT&CK Stage Progression Pathway
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+          {/* Attack Stage Progression */}
+          <div className="card p-5">
+            <h2 className="text-sm font-semibold text-[#0F3D56] uppercase tracking-wider mb-3">
+              Attack Stage Progression
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
               {STAGE_NAMES.map((name, idx) => {
                 const isCurrent = prediction.current_stage === idx;
                 const isPast = prediction.current_stage > idx;
-                const isFuturePredicted = prediction.forecast?.some(f => f.stage === idx) && !isCurrent && !isPast;
-                const color = getStageColor(idx);
+                const isFuturePredicted = prediction.forecast?.some((f) => f.stage === idx) && !isCurrent && !isPast;
 
                 return (
                   <div
                     key={idx}
-                    className={`p-4 rounded-xl border transition-all ${
+                    className={`p-3 rounded border text-xs ${
                       isCurrent
-                        ? 'border-2 scale-105 shadow-[0_0_20px_rgba(0,245,255,0.3)] bg-cyan-950/40'
+                        ? 'border-[#0EA5A8] bg-[#F0FDFA] font-medium'
                         : isPast
-                        ? 'border-gray-700 bg-black/40 opacity-70'
+                        ? 'border-slate-200 bg-slate-50 text-slate-500'
                         : isFuturePredicted
-                        ? 'border-dashed border-purple-400/80 bg-purple-950/20'
-                        : 'border-gray-800 bg-black/30 opacity-40'
+                        ? 'border-amber-300 bg-amber-50 text-slate-700'
+                        : 'border-slate-200 bg-white text-slate-400'
                     }`}
-                    style={{ borderColor: isCurrent ? color : undefined }}
                   >
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-mono px-2 py-0.5 rounded bg-black/60 text-gray-300">
-                        Phase {idx}
-                      </span>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] text-slate-400 uppercase font-mono">Stage {idx}</span>
                       {isCurrent && (
-                        <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-cyan-500 text-black">
-                          ACTIVE
-                        </span>
+                        <span className="text-[10px] font-bold text-[#0EA5A8] uppercase">Active</span>
                       )}
                       {isFuturePredicted && (
-                        <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-purple-500/40 text-purple-200">
-                          PREDICTED
-                        </span>
+                        <span className="text-[10px] font-semibold text-amber-700 uppercase">Predicted</span>
                       )}
                     </div>
-                    <div className="font-bold text-sm text-gray-100 mb-1">{name}</div>
-                    <div className="text-[11px] text-gray-400">
-                      {idx === 0 && "Normal baseline activity, standard port & volume distributions."}
-                      {idx === 1 && "Port scanning, IP sweeping, elevated SYN packets, high port entropy."}
-                      {idx === 2 && "Brute force attempts, active connection flooding, anomalous RSTs."}
-                      {idx === 3 && "Internal reconnaissance, east-west host probing, asymmetric flows."}
-                      {idx === 4 && "Large outbound transfers, anomalous beaconing on C2 high ports."}
+                    <div className={`font-semibold ${isCurrent ? 'text-[#0F3D56]' : 'text-slate-700'}`}>
+                      {name}
                     </div>
                   </div>
                 );
@@ -502,68 +442,61 @@ export default function Prediction() {
             </div>
           </div>
 
-          {/* Explainability & Feature Attribution + Mitigation Playbook */}
+          {/* Explainability & Decision Support */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Explainability */}
-            <div className="card p-6 border border-cyan-500/30">
-              <h3 className="text-xl font-bold text-cyan-100 mb-2 flex items-center gap-2">
-                <SparklesIcon className="w-5 h-5 text-cyan-400" />
-                Feature Attribution & Explainability (XAI)
-              </h3>
-              <p className="text-xs text-gray-400 mb-4">
-                Telemetry features with highest attribution weight contributing to the forecast.
+            {/* Explainability (Top contributing features) */}
+            <div className="card p-5">
+              <h2 className="text-sm font-semibold text-[#0F3D56] uppercase tracking-wider mb-1">
+                Feature Attribution
+              </h2>
+              <p className="text-xs text-slate-500 mb-4">
+                Telemetry indicators contributing to current risk score
               </p>
 
               <div className="space-y-3">
                 {prediction.contributing_features && prediction.contributing_features.length > 0 ? (
-                  prediction.contributing_features.map((feat, idx) => (
-                    <div key={idx} className="bg-black/40 p-3 rounded-lg border border-gray-800">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="font-medium text-cyan-200">{feat.feature}</span>
-                        <span className="text-purple-300 font-bold">{Math.round(feat.contribution * 100)}% Weight</span>
+                  prediction.contributing_features.map((feat, idx) => {
+                    const weightPct = Math.round(feat.contribution * 100);
+                    const levelLabel = weightPct >= 20 ? 'High contribution' : weightPct >= 10 ? 'Medium contribution' : 'Low contribution';
+
+                    return (
+                      <div key={idx} className="border-b border-slate-100 pb-2 last:border-0">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="font-medium text-[#172033]">{feat.feature}</span>
+                          <span className="text-slate-500">{levelLabel}</span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-1.5">
+                          <div
+                            className="h-1.5 rounded-full bg-[#0EA5A8]"
+                            style={{ width: `${Math.min(feat.contribution * 100, 100)}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
-                        <div
-                          className="h-1.5 rounded-full bg-gradient-to-r from-cyan-400 to-purple-500"
-                          style={{ width: `${Math.min(feat.contribution * 100, 100)}%` }}
-                        />
-                      </div>
-                      <div className="text-[11px] text-gray-400 mt-1">
-                        Observed value: <span className="text-gray-200 font-mono">{typeof feat.value === 'number' ? feat.value.toFixed(4) : feat.value}</span>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
-                  <p className="text-sm text-gray-400">All features within nominal baseline bounds.</p>
+                  <p className="text-xs text-slate-500">All features within nominal baseline bounds.</p>
                 )}
               </div>
-
-              {prediction.model_note && (
-                <div className="mt-4 p-3 bg-cyan-950/30 border border-cyan-500/20 rounded-lg text-xs text-cyan-200/80">
-                  ℹ️ {prediction.model_note}
-                </div>
-              )}
             </div>
 
-            {/* Defensive Countermeasures */}
-            <div className="card p-6 border border-cyan-500/30">
-              <h3 className="text-xl font-bold text-cyan-100 mb-2 flex items-center gap-2">
-                <ShieldCheckIcon className="w-5 h-5 text-green-400" />
-                Recommended Defensive Countermeasures
-              </h3>
-              <p className="text-xs text-gray-400 mb-4">
-                Automated response playbook generated for Phase {prediction.current_stage} ({prediction.current_stage_label}).
+            {/* Decision Support Playbook */}
+            <div className="card p-5">
+              <h2 className="text-sm font-semibold text-[#0F3D56] uppercase tracking-wider mb-1">
+                Decision Support
+              </h2>
+              <p className="text-xs text-slate-500 mb-4">
+                Recommended responses for {prediction.current_stage_label || prediction.stage_label}
               </p>
 
               <div className="space-y-3">
                 {getMitigationPlan(prediction.current_stage).map((item, idx) => (
-                  <div key={idx} className="bg-black/40 p-3 rounded-lg border border-gray-800 flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
-                      {idx + 1}
+                  <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded text-xs">
+                    <div className="font-semibold text-[#0F3D56] mb-0.5">
+                      {idx + 1}. {item.action}
                     </div>
-                    <div>
-                      <div className="text-sm font-semibold text-cyan-200">{item.action}</div>
-                      <div className="text-xs text-gray-400 mt-0.5">{item.detail}</div>
+                    <div className="text-slate-600">
+                      {item.detail}
                     </div>
                   </div>
                 ))}

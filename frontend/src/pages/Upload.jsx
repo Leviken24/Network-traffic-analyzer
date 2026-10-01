@@ -2,19 +2,20 @@ import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { uploadFile } from '../api/client';
-import { CloudArrowUpIcon, DocumentIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon, DocumentTextIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 export default function Upload() {
   const [file, setFile] = useState(null);
   const [windowSeconds, setWindowSeconds] = useState(60);
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState('READY'); // READY, PROCESSING, COMPLETED, FAILED
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   const onDrop = useCallback(acceptedFiles => {
     if (acceptedFiles?.length > 0) {
       setFile(acceptedFiles[0]);
-      setError('');
+      setStatus('READY');
+      setErrorMessage('');
     }
   }, []);
 
@@ -30,112 +31,146 @@ export default function Upload() {
 
   const handleUpload = async () => {
     if (!file) return;
-    setIsUploading(true);
-    setError('');
+    setStatus('PROCESSING');
+    setErrorMessage('');
     
     try {
       const job = await uploadFile(file, windowSeconds);
-      navigate(`/jobs`);
+      setStatus('COMPLETED');
+      setTimeout(() => {
+        navigate(`/jobs`);
+      }, 800);
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'Upload failed');
-      setIsUploading(false);
+      setStatus('FAILED');
+      setErrorMessage(err.response?.data?.detail || err.message || 'Ingestion failed');
     }
   };
 
+  const formatFileSize = (bytes) => {
+    if (!bytes) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   return (
-    <div className="max-w-3xl mx-auto mt-6 space-y-6 animate-fadeIn">
-      <div className="text-center">
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-purple-400 mb-2">
-          Network Traffic Ingestion
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Page Title */}
+      <div>
+        <h1 className="text-xl font-bold text-[#0F3D56]">
+          Upload Network Telemetry
         </h1>
-        <p className="text-sm text-cyan-200/70">
-          Upload PCAP, PCAPNG, or CIC-IDS2018 CSV telemetry to extract bidirectional flows and generate temporal network states.
+        <p className="text-xs text-slate-500 mt-1">
+          Ingest raw capture files to extract bidirectional flows and aggregate temporal state windows.
         </p>
       </div>
 
-      <div className="card p-8 border border-cyan-500/30">
+      <div className="card p-6 space-y-6">
+        {/* Dropzone */}
         <div 
           {...getRootProps()} 
-          className={`cursor-pointer border-2 border-dashed rounded-2xl p-10 text-center transition-all ${
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
             isDragActive 
-              ? 'border-cyan-400 bg-cyan-950/30 shadow-[0_0_30px_rgba(0,245,255,0.2)]' 
-              : 'border-cyan-500/30 bg-black/40 hover:border-cyan-400 hover:bg-black/60'
+              ? 'border-[#0EA5A8] bg-[#F0FDFA]' 
+              : 'border-slate-300 hover:border-slate-400 bg-slate-50/50'
           }`}
         >
           <input {...getInputProps()} />
-          
-          {file ? (
-            <div className="flex flex-col items-center">
-              <DocumentIcon className="h-16 w-16 text-cyan-400 mb-3 animate-pulse" />
-              <p className="text-lg font-mono font-bold text-cyan-100">{file.name}</p>
-              <p className="text-xs text-gray-400 mt-1">{(file.size / (1024 * 1024)).toFixed(2)} MB · Ready for ingestion</p>
-              <span className="mt-3 text-xs text-cyan-300 underline">Click to choose a different file</span>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <CloudArrowUpIcon className="h-16 w-16 text-cyan-400/70 mb-3" />
-              <p className="text-lg font-semibold text-gray-200 mb-1">Drag & drop your capture file here</p>
-              <p className="text-xs text-gray-400">or click to browse (.pcap, .pcapng, .csv)</p>
-              <div className="mt-4 flex gap-2 text-[11px] font-mono text-cyan-400/80">
-                <span className="px-2 py-0.5 rounded bg-cyan-950/60 border border-cyan-800">Raw PCAP</span>
-                <span className="px-2 py-0.5 rounded bg-purple-950/60 border border-purple-800">CIC-IDS2018 CSV</span>
-                <span className="px-2 py-0.5 rounded bg-pink-950/60 border border-pink-800">Generic NetFlow CSV</span>
-              </div>
-            </div>
-          )}
+          <div className="flex flex-col items-center justify-center">
+            <ArrowUpTrayIcon className="w-8 h-8 text-slate-400 mb-2" />
+            <p className="text-xs font-semibold text-[#0F3D56]">
+              Click to select or drag and drop telemetry file
+            </p>
+            <p className="text-[11px] text-slate-500 mt-1">
+              Supported formats: CSV, PCAP, PCAPNG
+            </p>
+          </div>
         </div>
 
-        {error && (
-          <div className="mt-4 p-4 bg-red-950/40 border border-red-500/50 text-red-300 rounded-lg text-sm">
-            {error}
+        {/* Selected File Details */}
+        {file && (
+          <div className="border border-slate-200 rounded-md p-4 bg-white flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <DocumentTextIcon className="w-7 h-7 text-[#0F3D56]" />
+              <div>
+                <div className="text-xs font-semibold text-slate-800">{file.name}</div>
+                <div className="text-[11px] text-slate-500">Size: {formatFileSize(file.size)}</div>
+              </div>
+            </div>
+
+            <div>
+              {status === 'READY' && (
+                <span className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+                  Ready
+                </span>
+              )}
+              {status === 'PROCESSING' && (
+                <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                  Processing
+                </span>
+              )}
+              {status === 'COMPLETED' && (
+                <span className="text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded flex items-center gap-1">
+                  <CheckCircleIcon className="w-3.5 h-3.5 text-emerald-600" />
+                  Completed
+                </span>
+              )}
+              {status === 'FAILED' && (
+                <span className="text-xs font-medium text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded flex items-center gap-1">
+                  <ExclamationCircleIcon className="w-3.5 h-3.5 text-rose-600" />
+                  Failed
+                </span>
+              )}
+            </div>
           </div>
         )}
 
-        <div className="mt-8 space-y-6">
-          <div className="bg-black/40 p-4 rounded-xl border border-gray-800">
-            <div className="flex justify-between items-center mb-2">
-              <label htmlFor="window" className="text-sm font-semibold text-cyan-200">
-                Time Window Aggregation Resolution: <span className="text-cyan-400 font-bold">{windowSeconds} seconds</span>
-              </label>
-              <span className="text-xs text-gray-400">Controls temporal granularity</span>
-            </div>
-            <input
-              id="window"
-              type="range"
-              min="10"
-              max="300"
-              step="10"
-              value={windowSeconds}
-              onChange={(e) => setWindowSeconds(Number(e.target.value))}
-              className="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
-              <span>10s (High temporal sensitivity)</span>
-              <span>60s (Recommended baseline)</span>
-              <span>300s (Macro trends)</span>
-            </div>
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded text-rose-700 text-xs">
+            {errorMessage}
           </div>
+        )}
 
+        {/* Window Resolution Configuration */}
+        <div className="border-t border-slate-100 pt-4 space-y-2">
+          <div className="flex justify-between items-center text-xs">
+            <label htmlFor="window-slider" className="font-medium text-slate-700">
+              Aggregation Resolution
+            </label>
+            <span className="font-semibold text-[#0F3D56]">{windowSeconds} seconds</span>
+          </div>
+          <input
+            id="window-slider"
+            type="range"
+            min="10"
+            max="300"
+            step="10"
+            value={windowSeconds}
+            onChange={(e) => setWindowSeconds(Number(e.target.value))}
+            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#0F3D56]"
+          />
+          <div className="flex justify-between text-[11px] text-slate-400">
+            <span>10s (High temporal sensitivity)</span>
+            <span>60s (Standard)</span>
+            <span>300s (Macro analysis)</span>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div>
           <button
             onClick={handleUpload}
-            disabled={!file || isUploading}
-            className={`w-full flex justify-center items-center py-3.5 px-4 rounded-xl font-bold text-base transition-all ${
-              !file || isUploading 
-                ? 'bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-cyan-400 to-purple-500 text-black hover:opacity-90 shadow-[0_0_25px_rgba(0,245,255,0.4)]'
+            disabled={!file || status === 'PROCESSING'}
+            className={`w-full py-2.5 px-4 rounded text-xs font-semibold transition-colors ${
+              !file || status === 'PROCESSING'
+                ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                : 'bg-[#0F3D56] text-white hover:bg-[#164967]'
             }`}
           >
-            {isUploading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Ingesting & Extracting Features...
-              </span>
-            ) : (
-              'Ingest Traffic & Generate Network States'
-            )}
+            {status === 'PROCESSING' ? 'Processing Telemetry...' : 'Process Telemetry Data'}
           </button>
         </div>
       </div>

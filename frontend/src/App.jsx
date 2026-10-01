@@ -12,50 +12,14 @@ const Benchmark = lazy(() => import('./pages/Benchmark'));
 
 export default function App() {
   return (
-    <div className="relative min-h-screen bg-[#03040a] text-cyan-50 flex flex-col overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="
-            absolute -top-40 -left-40
-            w-[500px] h-[500px]
-            rounded-full
-            bg-cyan-400/15
-            blur-[130px]
-            animate-pulse
-          "
-        />
-        <div
-          className="
-            absolute top-1/3 -right-40
-            w-[500px] h-[500px]
-            rounded-full
-            bg-fuchsia-500/15
-            blur-[130px]
-            animate-pulse
-          "
-        />
-        <div
-          className="
-            absolute -bottom-40 left-1/3
-            w-[600px] h-[400px]
-            rounded-full
-            bg-purple-500/15
-            blur-[140px]
-            animate-pulse
-          "
-        />
-      </div>
+    <div className="min-h-screen bg-[#F8FAFC] text-[#172033] flex flex-col antialiased">
+      <NavBar />
 
-      <div className="relative z-10">
-        <NavBar />
-      </div>
-
-      <main className="relative z-10 flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <Suspense fallback={
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
-            <p className="text-xs font-mono text-cyan-300">Loading module...</p>
+          <div className="flex flex-col items-center justify-center h-64 gap-3 text-slate-500">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-[#0F3D56]"></div>
+            <span className="text-xs font-medium">Loading view...</span>
           </div>
         }>
           <Routes>
